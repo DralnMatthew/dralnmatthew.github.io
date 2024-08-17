@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>New Particle Formation</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:image" content="https://jonbarron.info/zipnerf/img/nottingham.jpg">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1296">
+    <meta property="og:image:height" content="840">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jonbarron.info/zipnerf/"/>
+    <meta property="og:title" content="Zip-NeRF: Anti-Aliased Grid-Based Neural Radiance Fields" />
+    <meta property="og:description" content="Neural Radiance Field training can be accelerated through the use of grid-based representations in NeRF's learned mapping from spatial coordinates to colors and volumetric density. However, these grid-based approaches lack an explicit understanding of scale and therefore often introduce aliasing, usually in the form of jaggies or missing scene content. Anti-aliasing has previously been addressed by mip-NeRF 360, which reasons about sub-volumes along a cone rather than points along a ray, but this approach is not natively compatible with current grid-based techniques. We show how ideas from rendering and signal processing can be used to construct a technique that combines mip-NeRF 360 and grid-based models such as Instant NGP to yield error rates that are 8%-77% lower than either prior technique, and that trains 24x faster than mip-NeRF 360." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zip-NeRF: Anti-Aliased Grid-Based Neural Radiance Fields" />
+    <meta name="twitter:description" content="Neural Radiance Field training can be accelerated through the use of grid-based representations in NeRF's learned mapping from spatial coordinates to colors and volumetric density. However, these grid-based approaches lack an explicit understanding of scale and therefore often introduce aliasing, usually in the form of jaggies or missing scene content. Anti-aliasing has previously been addressed by mip-NeRF 360, which reasons about sub-volumes along a cone rather than points along a ray, but this approach is not natively compatible with current grid-based techniques. We show how ideas from rendering and signal processing can be used to construct a technique that combines mip-NeRF 360 and grid-based models such as Instant NGP to yield error rates that are 8%-77% lower than either prior technique, and that trains 24x faster than mip-NeRF 360." />
+    <meta name="twitter:image" content="https://jonbarron.info/zipnerf/img/teaser.jpg" />
+
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.3/clipboard.min.js"></script>
+    
+    <script src="js/app.js"></script>
+    <script src="js/video_comparison.js"></script>
+</head>
+
+<body>
+    <div class="container" id="main">
+        <div class="row">
+            <h2 class="col-md-12 text-center">
+                Machine and Deep Learning Methods for Automatic Identification of Atmospheric New Particle Formation
+            </h2>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <ul class="list-inline">
+                    <li>
+                        <a href="https://dralnmatthew.github.io/">
+                          Zhanghu Zhao
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://www.marthazaidan.com/">Martha Arbayani Zaidan</a>
+                    </li>
+                    <li>
+                        <a href="https://www.helsinki.fi/fi/tutustu-meihin/ihmiset/henkilohaku/tuomo-nieminen-9096608">Tuomo Nieminen</a>
+                    </li>
+                    <li>
+                        <a href="https://researchportal.helsinki.fi/en/persons/tareq-hussein">Tareq Hussein</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Abstract
+                </h3>
+                <p class="text-justify">
+                    Atmospheric new-particle formation (NPF) plays a crucial role in generating climate-influencing aerosol particles. Direct observation of NPF is achievable by tracking the evolution of aerosol particle size distributions in the environment. Such analysis allows researchers to determine the occurrence of NPF on specific days. Currently, the most dependable method for categorizing days into NPF event (class Ia, class Ib, class II) or non-event categories relies on manual visual analysis. However, this manual process is labor-intensive and subjective, particularly with long- term data series. These issues underscore the need for an automated classification system to classify these days more objectively.
+                    <br>
+                    This research introduces feature-engineering based machine learning classifiers to discern NPF event and non-event days at the SMEAR II station in Hyytiälä, Finland. The classification utilizes a suite of informative features derived from the multi-modal log-normal distribution fitted to the aerosol particle concentration data and time series analysis at various scales. The proposed machine learning classifiers can achieve an accuracy of more than 90% in identifying NPF event and non-event days. Moreover, they are able to reach an accuracy of around 80% in further categorizing days into detailed subcategories including class Ia, class Ib, class II, and non-event. Notably, the machine learning classifiers reliably predict all event Ia days where particle growth and formation rates are confidently measurable. Moreover, a comparative analysis is conducted between feature-engineering machine learning methods and image-based deep learning in terms of time efficiency and overall performance. The conclusion drawn is that through reasonable feature engineering, machine learning methods can match or even surpass deep learning approaches, particularly in scenarios where time efficiency is paramount. The results of this study strongly support further investigation into this area to improve our knowledge and proficiency in automating New Particle Formation (NPF) event detection.
+                </p>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Pipeline
+                </h3>
+                <div style="text-align: center;">
+                    <img width=100% src="img/pipeline.png">
+                </div>
+                <p class="text-justify">
+                    This section outlines the comprehensive pipeline developed for the classification of New Particle Formation (NPF) events utilizing feature engineering-based machine learning techniques. Each stage of the pipeline is meticulously designed to process and analyze atmospheric particle data captured through Differential Mobility Particle Sizer (DMPS) systems.
+                </p>
+            </div>
+        </div>
+<br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Feature Calculation
+                </h3>
+
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <img width=100% src="img/calculation.png">
+                        </td>
+                        <td style="text-align: center;">
+                            <img width=90% src="img/3-modes-fitting.png">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; width: 50%; word-wrap: break-word;">
+                            The ambient aerosol particle distribution at each time instance
+                        </td>
+                        <td style="text-align: center; width: 50%; word-wrap: break-word;">
+                            3 modes fitting of the ambient aerosol particle distribution
+                        </td>
+                    </tr>
+                </table>
+
+                <p class="text-justify">
+                    In our analysis of particle size distribution, we employ a three-mode fitting algorithm to
+                    better understand the complexity of aerosol particles. By decomposing the overall particle size
+                    distribution at each instance of time into three distinct modes, the method provides clear insights into the dynamic
+                    processes of particle formation and evolution in the atmosphere.
+                </p>
+            </div>
+        </div>
+           
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Feature Extraction
+                </h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="text-align: center;">
+                            <img width=100% src="img/extraction.png">
+                        </td>
+                        <td style="text-align: center;">
+                            <img width=100% src="img/daytime.png">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="text-align: center; width: 50%; word-wrap: break-word;">
+                            Time-domain features for one day
+                        </td>
+                        <td style="text-align: center; width: 50%; word-wrap: break-word;">
+                            Sunrise and Sunset time
+                        </td>
+                    </tr>
+
+                </table>
+                <p class="text-justify">
+                    In our approach to analyzing New Particle Formation (NPF) events, we focus on measurements collected exclusively during daylight hours based on the understanding that NPF
+                    mostly happens in the daytime. This targeted data selection makes sure that the
+                    dataset captures the most relevant atmospheric conditions conducive to NPF events and
+                    further enhances the predictive accuracy of our models.
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    AlexNet
+                </h3>
+                <div style="text-align: center;">
+                    <img width=70% src="img/alexnet.jpeg">
+                </div>
+                <p class="text-justify">
+                    For our purposes, AlexNet couldn’t identify NPF events without adjustments because the
+                    original model does not have understanding of the relevant NPF shapes. In this way,
+                    we make some customization to handle other image types and adopt a transfer-learning
+                    approach to retrain it for analyzing PSD images. Through modifying the final layers of
+                    AlexNet, we can adapt the network with fewer images than its initial training required.
+                    This efficient method employs the layered structure of CNNs: early layers extract
+                    complex features into more manageable abstractions, while the adjusted final layers are
+                    fine-tuned to predict specific classes.
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Mask R-CNN
+                </h3>
+                <div style="text-align: center;">
+                    <img width=70% src="img/mask.png">
+                </div>
+                <p class="text-justify">
+                    It is generally straightforward for humans to discern the occurrence of NPF events in
+                    graphical plots or to identify objects, such as cats, in digital images. This insight led us
+                    to imagine banana-shaped NPF events as distinct objects, suggesting that object detection methods used in digital image
+                    analysis could also be adapted to detect these specific NPF patterns. In this way, our
+                    approach utilizes a deep learning technique known as Mask R-CNN, which is an instance
+                    segmentation method proven effective in localizing objects within images. This
+                    model is particularly adept at delineating the spatial contours of objects, hence it’s employed to accurately outline the banana-shaped configuration of NPF events. Essentially,
+                    this method allows us to directly target the visual markers of NPF occurrences, and thus
+                    provides a novel solution to classifying these events
+                </p>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Acknowledgements
+                </h3>
+                <p class="text-justify">
+                    This project is funded by the Helsinki Institute for Information Technology (HIIT) and the Academy of Finland Research Fellowship.
+                Thanks to Martha Arbayani Zaidan, Tuomo Nieminen, and Tareq Hussein for their advice and help.
+                    <br><br>
+                The website template was borrowed from <a href="http://mgharbi.com/">Michaël Gharbi</a> and <a href="https://dorverbin.github.io/refnerf">Ref-NeRF</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
