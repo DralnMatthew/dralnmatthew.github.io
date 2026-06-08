@@ -81,40 +81,40 @@ tr,
 p,
 a {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 18px;
+  line-height: 1.58;
 }
 
 p {
   margin-top: 0;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 strong {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 h2 {
-  margin: 24px 0 16px;
+  margin: 32px 0 20px;
   font-weight: 600;
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 24px;
+  font-size: 30px;
   line-height: 1.25;
 }
 
 .papertitle {
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 1.35;
+  font-size: 18px;
+  line-height: 1.45;
   font-weight: 700;
 }
 
 .name {
-  padding-top: 20px;
+  padding-top: 24px;
   margin: 0;
   font-family: 'Lato', Verdana, Helvetica, sans-serif;
-  font-size: 32px;
+  font-size: 40px;
 }
 
 .one {
