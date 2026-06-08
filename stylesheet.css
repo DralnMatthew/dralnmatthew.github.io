@@ -124,8 +124,8 @@
 
 /* ---------- Design tokens ---------- */
 :root {
-  --font-sans: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, Verdana, sans-serif;
+  --font-sans: "Inter", "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, Verdana, sans-serif;
   --font-zh: "LXGW WenKai TC", "KaiTi", "Source Han Serif SC", serif;
   --link: #1772d0;
   --link-hover: #f09228;
