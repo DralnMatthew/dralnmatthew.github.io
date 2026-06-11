@@ -1,139 +1,77 @@
-/* latin-ext */
-@font-face {
-  font-family: "Lato";
-  font-style: italic;
-  font-weight: 400;
-  src:
-    local("Lato Italic"),
-    local("Lato-Italic"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAUi-qNiXg7eU0.woff2)
-      format("woff2");
-  unicode-range:
-    U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113,
-    U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* latin */
-@font-face {
-  font-family: "Lato";
-  font-style: italic;
-  font-weight: 400;
-  src:
-    local("Lato Italic"),
-    local("Lato-Italic"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u8w4BMUTPHjxsAXC-qNiXg7Q.woff2)
-      format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-    U+FFFD;
-}
-
-/* latin-ext */
-@font-face {
-  font-family: "Lato";
-  font-style: italic;
-  font-weight: 700;
-  src:
-    local("Lato Bold Italic"),
-    local("Lato-BoldItalic"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u_w4BMUTPHjxsI5wq_FQftx9897sxZ.woff2)
-      format("woff2");
-  unicode-range:
-    U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113,
-    U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* latin */
-@font-face {
-  font-family: "Lato";
-  font-style: italic;
-  font-weight: 700;
-  src:
-    local("Lato Bold Italic"),
-    local("Lato-BoldItalic"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u_w4BMUTPHjxsI5wq_Gwftx9897g.woff2)
-      format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-    U+FFFD;
-}
-
-/* latin-ext */
-@font-face {
-  font-family: "Lato";
-  font-style: normal;
-  font-weight: 400;
-  src:
-    local("Lato Regular"),
-    local("Lato-Regular"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2)
-      format("woff2");
-  unicode-range:
-    U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113,
-    U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* latin */
-@font-face {
-  font-family: "Lato";
-  font-style: normal;
-  font-weight: 400;
-  src:
-    local("Lato Regular"),
-    local("Lato-Regular"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjx4wXiWtFCc.woff2)
-      format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-    U+FFFD;
-}
-
-/* latin-ext */
-@font-face {
-  font-family: "Lato";
-  font-style: normal;
-  font-weight: 700;
-  src:
-    local("Lato Bold"),
-    local("Lato-Bold"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u9w4BMUTPHh6UVSwaPGQ3q5d0N7w.woff2)
-      format("woff2");
-  unicode-range:
-    U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113,
-    U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* latin */
-@font-face {
-  font-family: "Lato";
-  font-style: normal;
-  font-weight: 700;
-  src:
-    local("Lato Bold"),
-    local("Lato-Bold"),
-    url(https://fonts.gstatic.com/s/lato/v15/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2)
-      format("woff2");
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-    U+FFFD;
-}
+/* ============================================================
+   Zhanghu Zhao — personal homepage
+   Semantic, single-column responsive layout (no table hacks).
+   ============================================================ */
 
 /* ---------- Design tokens ---------- */
 :root {
-  --font-sans: "Inter", "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Helvetica, Arial, Verdana, sans-serif;
-  --font-zh: "LXGW WenKai TC", "KaiTi", "Source Han Serif SC", serif;
-  --link: #1772d0;
-  --link-hover: #f09228;
-  --accent: #368f6b; /* 墨绿色 */
-  --ink: #1a1a1a;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --link: #1565c0;        /* AA-safe blue (~5.4:1 on white) */
+  --link-hover: #b35400;  /* AA-safe burnt orange (~4.6:1) */
+  --accent: #2c7a59;      /* 墨绿色, darkened to pass AA (~4.7:1) */
+
+  --ink: #1f2328;
   --ink-strong: #111;
-  --muted: #666;
+  --muted: #6a6a6a;
   --rule: #ececec;
+  --rule-soft: #f1f1f1;
+
+  --maxw: 760px;
+  --gap-section: 44px;
+}
+
+/* ---------- Reset / base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #fff;
+  font-family: var(--font-sans);
+  font-size: 16.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+p {
+  margin: 0 0 0.9em;
+  overflow-wrap: anywhere; /* long links/URLs never overflow the viewport */
+}
+
+strong {
+  font-weight: 700;
+  color: var(--ink-strong); /* weight carries emphasis; no scattered color */
+}
+
+/* ---------- Skip link (keyboard / screen-reader) ---------- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ink-strong);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 6px 0;
+  z-index: 10;
+}
+.skip-link:focus {
+  left: 0;
 }
 
 /* ---------- Links ---------- */
@@ -141,115 +79,154 @@ a {
   color: var(--link);
   text-decoration: none;
   transition: color 0.15s ease;
+  overflow-wrap: anywhere;
 }
-
-a:focus,
 a:hover {
   color: var(--link-hover);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
-
 a:focus-visible {
   outline: 2px solid var(--link);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-/* ---------- Base typography ---------- */
-body {
-  margin: 0;
-  color: var(--ink);
-  background: #fff;
-  line-height: 1.6;
-  overflow-x: hidden; /* guard against any stray horizontal scroll on phones */
-  -webkit-text-size-adjust: 100%; /* don't let iOS auto-inflate text */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ---------- Layout container ---------- */
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px 24px 64px;
 }
 
-body,
-td,
-th,
-tr,
-p,
-li,
-a,
-span {
-  font-family: var(--font-sans);
-  font-size: 16px; /* was 14px — the main reason text felt small */
-  line-height: 1.6;
+section {
+  margin-top: var(--gap-section);
 }
 
-p {
-  margin: 0 0 0.9em;
+/* ---------- Header / intro ---------- */
+.intro {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
 
-/* Images can never cause horizontal overflow */
-img {
-  max-width: 100%;
-  height: auto;
+.intro-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-strong {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  color: var(--accent);
+.intro-photo {
+  flex: 0 0 auto;
+  width: 190px;
+  max-width: 38%;
 }
 
-/* ---------- Name ----------
-   HTML uses <p class="name">, so the old `name {}` element rule never matched
-   and the heading rendered at body size. Target the class instead. */
-.name {
+.intro-photo img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
   display: block;
-  font-family: var(--font-sans);
-  font-size: clamp(28px, 6vw, 36px);
+}
+
+.name {
+  font-size: clamp(28px, 6vw, 38px);
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--ink-strong);
-  margin: 0 0 0.45em;
+  margin: 0 0 0.5em;
 }
 
-.name:lang(zh),
-.name:lang(zh-CN) {
-  font-family: var(--font-zh);
+.intro-text p {
+  margin: 0 0 0.7em;
 }
 
-/* ---------- Paper / project titles ----------
-   HTML uses <span class="papertitle">; old `papertitle {}` never matched. */
-.papertitle {
-  font-family: var(--font-sans);
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: #333;
+/* ---------- Contact / social nav ---------- */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 6px;
+  margin-top: 14px;
+  padding: 0;
+  list-style: none;
 }
 
-a:hover .papertitle,
-a:focus .papertitle {
-  color: var(--link-hover);
+.links li {
+  display: flex;
+  align-items: center;
+}
+
+.links li:not(:last-child)::after {
+  content: "/";
+  color: #c8c8c8;
+  margin-left: 6px;
+}
+
+.links a {
+  font-weight: 500;
+  padding: 4px 2px;
 }
 
 /* ---------- Section headings ---------- */
 h2 {
-  font-family: var(--font-sans);
-  font-size: clamp(22px, 1.1rem + 1.2vw, 26px);
+  font-size: clamp(20px, 1rem + 1vw, 24px);
   font-weight: 700;
   line-height: 1.3;
   color: var(--ink-strong);
-  margin: 0 0 0.6em;
-  padding-bottom: 0.3em;
+  margin: 0 0 0.85em;
+  padding-bottom: 0.35em;
   border-bottom: 1px solid var(--rule);
+  position: relative;
 }
 
-/* ---------- Lists (News, etc.) ---------- */
-li {
-  margin-bottom: 0.5em;
+/* short green accent underline — the one intentional use of the brand green */
+h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 44px;
+  height: 2px;
+  background: var(--accent);
 }
 
-/* ---------- Education ----------
-   These classes are used in index.html but were never defined, so the logos
-   rendered at raw size and the rows didn't align. Lay them out as a flex row. */
+/* ---------- News ---------- */
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.news-list li {
+  margin-bottom: 0.6em;
+}
+.news-date {
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+/* ---------- Research interests ---------- */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tags li {
+  font-size: 14px;
+  background: #f4f6f5;
+  color: #2c4a3e;
+  border: 1px solid #e3eae6;
+  padding: 4px 11px;
+  border-radius: 999px;
+}
+
+/* ---------- Education ---------- */
 .education-list {
   list-style: none;
   margin: 0;
@@ -258,18 +235,17 @@ li {
 
 .education-item {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 18px;
-  padding: 14px 0;
+  padding: 15px 0;
 }
 
 .education-item:not(:last-child) {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--rule-soft);
 }
 
 .education-logo {
-  flex: 0 0 auto;
+  flex: 0 0 56px;
   width: 56px;
   height: 56px;
   display: flex;
@@ -280,140 +256,85 @@ li {
 .education-logo img {
   max-width: 56px;
   max-height: 56px;
-  object-fit: contain; /* normalizes the mismatched png/svg logo sizes */
+  object-fit: contain;
 }
 
 .education-content {
-  flex: 1 1 220px;
-  min-width: 0; /* let long text wrap instead of forcing overflow */
-  line-height: 1.55;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
-/* ---------- Footer credit (muted, but keeps WCAG AA contrast) ---------- */
-p[style*="font-size: small"] {
+.education-content .degree {
+  font-weight: 700;
+  color: var(--ink-strong);
+}
+
+.education-content .school {
+  color: var(--ink);
+}
+
+.education-content .meta {
   color: var(--muted);
+  font-size: 15px;
 }
 
-/* ---------- Legacy helper classes kept from the original sheet ---------- */
-.main-container-table {
-  width: 100%;
-  max-width: 820px;
-  margin: 0 auto;
-  border-spacing: 0;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.section-title {
-  font-size: 18px;
-  margin: 0;
-}
-
-.pub-img img {
-  border-radius: 12px;
-}
-
-.pub-content em {
-  background: #f1f1f1;
-  padding: 2px 6px;
-  font-style: normal;
-  font-size: 12px;
-  border-radius: 6px;
-  margin-right: 4px;
-}
-
-.map-container {
-  max-width: 820px;
-  margin: auto;
-}
-
-.position-line,
-.degree-line {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 400px;
-  flex-wrap: wrap;
-}
-
-.position,
-.degree {
-  font-weight: normal;
-}
-
-.time {
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: var(--gap-section);
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
   color: var(--muted);
-  white-space: nowrap;
+  font-size: 14px;
+}
+.site-footer a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.site-footer a:hover {
+  color: var(--link-hover);
 }
 
-/* ===========================================================
-   RESPONSIVE — phone layout (<= 640px)
-   The page is built from <table>/<td> cells with inline percentage
-   widths. Desktop is left ENTIRELY to those native tables (zero change
-   above 640px); only here do the cells collapse into a single column,
-   so the intro (text + circular photo), the project rows (image + text)
-   and the education rows stack vertically with no horizontal scroll.
-   =========================================================== */
-@media (max-width: 640px) {
-  body table,
-  body tbody,
-  body tr,
-  body td {
-    display: block !important;
-    width: auto !important;
-    max-width: 100% !important;
-    box-sizing: border-box;
+/* ============================================================
+   Responsive — phones
+   ============================================================ */
+@media (max-width: 600px) {
+  .wrap {
+    padding: 28px 18px 48px;
   }
 
-  body td {
-    padding: 12px 16px !important;
-    vertical-align: top !important;
+  .intro {
+    flex-direction: column-reverse; /* photo on top, text below */
+    align-items: center;
+    text-align: center;
+    gap: 18px;
   }
 
-  /* Profile photo: centered and capped (dual hook survives a file/class
-     rename). The inline border-radius:50% / aspect-ratio keep it circular. */
-  img.hoverZoomLink,
-  img[src*="ZhanghuZhao"] {
-    display: block;
-    width: 200px !important;
-    max-width: 60% !important;
-    margin: 6px auto 4px;
+  .intro-photo {
+    width: 180px;
+    max-width: 55%;
   }
 
-  /* Project / publication thumbnail: cap and center when stacked */
-  td > div > img {
-    display: block;
-    max-width: 340px;
-    margin: 0 auto;
+  .links {
+    justify-content: center;
   }
 
-  /* Roomier tap targets on the Email / Linkedin / ... row */
-  p a {
-    padding: 2px 0;
-    display: inline-block;
+  /* roomier tap targets on the primary contact row */
+  .links a {
+    padding: 8px 4px;
   }
 
   .education-item {
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 
-/* Extra safety on the smallest phones (~320px) */
 @media (max-width: 360px) {
-  body,
-  td,
-  th,
-  tr,
-  p,
-  li,
-  a,
-  span {
-    font-size: 15px;
-  }
-
-  .education-item {
-    gap: 10px;
+  body {
+    font-size: 15.5px;
   }
 }
