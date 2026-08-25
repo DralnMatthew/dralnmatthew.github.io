@@ -65,7 +65,12 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=8" />
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=9" />
+
+    <!-- Theme: set before first paint by theme.js, so no flash of the
+         wrong scheme. Light by day, dark by night, following Helsinki. -->
+    <meta name="theme-color" content="#ffffff" />
+    <script src="../theme.js?v=1"></script>
   </head>
 
   <body>
@@ -79,13 +84,28 @@
           <a class="cv-back" href="../">&larr; Zhanghu Zhao</a>
           <h1>Curriculum Vitae</h1>
         </div>
-        <a
-          class="cv-open"
-          href="../data/JonBarron-CV.pdf"
-          target="_blank"
-          rel="noopener"
-          >Open PDF &#8599;</a
-        >
+        <div class="cv-actions">
+      <button type="button" class="theme-toggle">
+        <svg class="i-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" />
+        </svg>
+        <svg class="i-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" />
+          <path d="M12 1.8v2.4M12 19.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M1.8 12h2.4M19.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+        </svg>
+        <svg class="i-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.6A8.5 8.5 0 1 1 9.4 3.5a6.6 6.6 0 0 0 11.1 11.1z" />
+        </svg>
+      </button>
+          <a
+            class="cv-open"
+            href="../data/JonBarron-CV.pdf"
+            target="_blank"
+            rel="noopener"
+            >Open PDF &#8599;</a
+          >
+        </div>
       </div>
 
       <iframe

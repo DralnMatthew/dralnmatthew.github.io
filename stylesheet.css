@@ -3,10 +3,17 @@
    Semantic, single-column responsive layout (no table hacks).
    ============================================================ */
 
-/* ---------- Design tokens ---------- */
+/* ---------- Design tokens ----------
+   Two themes over one set of names. theme.js puts data-theme on <html>
+   before the first paint, following sunrise/sunset in Helsinki unless
+   the reader has overridden it with the toggle. Every colour below is
+   AA against its own background in both themes.
+   ------------------------------------ */
 :root {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif;
+
+  color-scheme: light;
 
   --link: #1565c0;        /* AA-safe blue (~5.4:1 on white) */
   --link-hover: #b35400;  /* AA-safe burnt orange (~4.6:1) */
@@ -18,8 +25,42 @@
   --rule: #ececec;
   --rule-soft: #f1f1f1;
 
+  --bg: #fff;
+  --sep: #c8c8c8;              /* the "/" between the contact links */
+  --chip-bg: #f4f6f5;          /* research tags, button hovers */
+  --chip-ink: #2c4a3e;
+  --chip-border: #e3eae6;
+  --btn-border: #dcdcdc;
+  --photo-ring: rgba(0, 0, 0, 0.06);
+  --photo-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  --viewer-bg: #f5f5f5;
+
   --maxw: 760px;
   --gap-section: 44px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --link: #79b8ff;        /* 8.7:1 on the dark ground */
+  --link-hover: #f0a35e;  /* 8.7:1 — the same burnt orange, lifted */
+  --accent: #56c39a;      /* 8.3:1 — the same 墨绿色, lifted */
+
+  --ink: #d5dae0;
+  --ink-strong: #f1f3f5;
+  --muted: #98a1ab;
+  --rule: #2b3037;
+  --rule-soft: #23282e;
+
+  --bg: #14161a;
+  --sep: #4a515a;
+  --chip-bg: #1b241f;
+  --chip-ink: #a7d9c0;
+  --chip-border: #2b3a33;
+  --btn-border: #343a42;
+  --photo-ring: rgba(255, 255, 255, 0.1);
+  --photo-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
+  --viewer-bg: #1b1f24;
 }
 
 /* ---------- Reset / base ---------- */
@@ -36,7 +77,8 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  background: #fff;
+  background: var(--bg);
+  transition: background-color 0.25s ease, color 0.25s ease;
   font-family: var(--font-sans);
   font-size: 16.5px;
   line-height: 1.65;
@@ -65,7 +107,7 @@ strong {
   left: -9999px;
   top: 0;
   background: var(--ink-strong);
-  color: #fff;
+  color: var(--bg);
   padding: 10px 16px;
   border-radius: 0 0 6px 0;
   z-index: 10;
@@ -126,8 +168,8 @@ section {
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--photo-ring);
+  box-shadow: var(--photo-shadow);
   display: block;
 }
 
@@ -161,7 +203,7 @@ section {
 
 .links li:not(:last-child)::after {
   content: "/";
-  color: #c8c8c8;
+  color: var(--sep);
   margin-left: 6px;
 }
 
@@ -219,9 +261,9 @@ h2::after {
 }
 .tags li {
   font-size: 14px;
-  background: #f4f6f5;
-  color: #2c4a3e;
-  border: 1px solid #e3eae6;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  border: 1px solid var(--chip-border);
   padding: 4px 11px;
   border-radius: 999px;
 }
@@ -400,7 +442,7 @@ h2::after {
   flex: 0 0 auto;
   font-weight: 500;
   white-space: nowrap;
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--btn-border);
   border-radius: 6px;
   padding: 7px 14px;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
@@ -408,7 +450,7 @@ h2::after {
 .cv-open:hover {
   text-decoration: none;
   border-color: var(--accent);
-  background: #f4f6f5;
+  background: var(--chip-bg);
 }
 
 .cv-viewer {
@@ -418,7 +460,7 @@ h2::after {
   min-height: 640px;
   border: 1px solid var(--rule);
   border-radius: 8px;
-  background: #f5f5f5;
+  background: var(--viewer-bg);
 }
 
 .cv-fallback {
@@ -436,4 +478,93 @@ h2::after {
     height: calc(100vh - 210px);
     min-height: 460px;
   }
+}
+
+/* ============================================================
+   Theme toggle — cycles automatic → light → dark → automatic.
+   Hidden without JavaScript, where the light theme is all there is.
+   ============================================================ */
+.theme-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--btn-border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+:root[data-mode] .theme-toggle {
+  display: inline-flex;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--chip-bg);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: none;
+}
+
+/* the icon shows the mode you are in, not the one you would switch to */
+:root[data-mode="auto"] .theme-toggle .i-auto,
+:root[data-mode="light"] .theme-toggle .i-light,
+:root[data-mode="dark"] .theme-toggle .i-dark {
+  display: block;
+}
+
+/* On the homepage the button floats clear of the centred column, so it
+   never collides with the text at any width. */
+.theme-dock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 5;
+}
+
+@media (max-width: 600px) {
+  .theme-dock {
+    right: 14px;
+    bottom: 14px;
+  }
+}
+
+/* ---------- Dark-theme touch-ups ----------
+   The university marks are dark ink on transparency, so in dark mode
+   they sit on a light chip rather than disappearing. Inverting them
+   would turn Soochow's red to cyan. */
+:root[data-theme="dark"] .education-logo {
+  background: #eef0f2;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+:root[data-theme="dark"] .education-logo img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* the CV toolbar carries its own toggle, next to "Open PDF" */
+.cv-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
