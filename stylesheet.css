@@ -367,7 +367,9 @@ h2 {
   font-size: 14.5px;
 }
 
-/* ---------- Publications: title, authors, venue ---------- */
+/* ---------- Publications: year column, then title / authors / venue ----------
+   The year sits in the same column as the News dates, so the two line up.
+   The title carries the weight; the authors stay small and muted. */
 .pub-list {
   list-style: none;
   margin: 0;
@@ -375,31 +377,70 @@ h2 {
 }
 
 .pub {
-  padding: 14px 0;
-  line-height: 1.55;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: baseline;
+}
+
+.pub + .pub {
+  margin-top: 18px;
+}
+
+.pub-year {
+  font-weight: 600;
+  color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.pub-body {
+  min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.pub:first-child {
-  padding-top: 2px;
-}
-
-.pub:not(:last-child) {
-  border-bottom: 1px solid var(--rule-soft);
-}
-
 .pub-title {
-  font-weight: 600;
+  display: block;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   color: var(--ink-strong);
 }
 
 .pub-authors {
+  display: block;
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.pub-authors strong {
+  font-weight: 500; /* own name: darker, not bolder */
+}
+
+/* the venue in ink, the presentation type as a small badge, as on the CV */
+.pub-venue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 6px;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.6;
   color: var(--ink);
 }
 
-.pub-venue {
+.pub-badge {
+  padding: 4px 7px 3px;
+  border-radius: 4px;
+  background: var(--rule-soft);
   color: var(--muted);
-  font-size: 14.5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* ---------- Footer ---------- */
@@ -458,7 +499,8 @@ h2 {
     row-gap: 2px;
   }
 
-  .news-list li {
+  .news-list li,
+  .pub {
     grid-template-columns: 64px minmax(0, 1fr);
     column-gap: 10px;
   }
