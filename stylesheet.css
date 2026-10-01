@@ -367,6 +367,41 @@ h2 {
   font-size: 14.5px;
 }
 
+/* ---------- Publications: title, authors, venue ---------- */
+.pub-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pub {
+  padding: 14px 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.pub:first-child {
+  padding-top: 2px;
+}
+
+.pub:not(:last-child) {
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.pub-title {
+  font-weight: 600;
+  color: var(--ink-strong);
+}
+
+.pub-authors {
+  color: var(--ink);
+}
+
+.pub-venue {
+  color: var(--muted);
+  font-size: 14.5px;
+}
+
 /* ---------- Footer ---------- */
 .site-footer {
   padding-top: 20px;
