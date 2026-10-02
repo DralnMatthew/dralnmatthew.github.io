@@ -84,9 +84,9 @@
   apply(mode);
 
   var LABELS = {
-    auto: "Theme: automatic, following sunrise and sunset in Helsinki. Switch to light.",
+    auto: "Theme: Helsinki — light by day, dark by night, following sunrise and sunset there. Switch to light.",
     light: "Theme: light. Switch to dark.",
-    dark: "Theme: dark. Switch back to automatic.",
+    dark: "Theme: dark. Switch back to Helsinki daylight.",
   };
   var NEXT = { auto: "light", light: "dark", dark: "auto" };
 

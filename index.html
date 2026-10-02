@@ -8,7 +8,7 @@
     <meta name="author" content="Zhanghu Zhao" />
     <meta
       name="description"
-      content="Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Research on amortized inference, Bayesian experimental design, and Bayesian optimization."
+      content="Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized methods for fast Bayesian inference, experimental design, and optimization."
     />
 
     <!-- Canonical URL -->
@@ -19,7 +19,7 @@
     <meta property="og:title" content="Zhanghu Zhao" />
     <meta
       property="og:description"
-      content="Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized inference, Bayesian experimental design, Bayesian optimization."
+      content="Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized methods for fast Bayesian inference, experimental design, and optimization."
     />
     <meta property="og:url" content="https://zhanghu-zhao.com/" />
     <meta
@@ -32,7 +32,7 @@
     <meta name="twitter:title" content="Zhanghu Zhao" />
     <meta
       name="twitter:description"
-      content="Doctoral Researcher at Aalto University — amortized inference, Bayesian experimental design, Bayesian optimization."
+      content="Doctoral Researcher at Aalto University — amortized methods for fast Bayesian inference, experimental design, and optimization."
     />
     <meta
       name="twitter:image"
@@ -68,12 +68,12 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" type="text/css" href="stylesheet.css?v=14" />
+    <link rel="stylesheet" type="text/css" href="stylesheet.css?v=15" />
 
     <!-- Theme: set before first paint by theme.js, so no flash of the
          wrong scheme. Light by day, dark by night, following Helsinki. -->
     <meta name="theme-color" content="#ffffff" />
-    <script src="theme.js?v=1"></script>
+    <script src="theme.js?v=2"></script>
 
     <!-- Structured data: Person (ties profiles to one entity for name queries) -->
     <script type="application/ld+json">
@@ -114,10 +114,14 @@
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <div class="wrap">
+      <!-- On phones the header becomes a grid: the photo sits beside the
+           name, and the paragraph and links take the full width below.
+           The wrapper div is `display: contents` there, so keep the name,
+           paragraph and nav as its only children. -->
       <header class="intro">
         <div class="intro-text">
           <h1 class="name">Zhanghu Zhao</h1>
-          <p>
+          <p class="intro-lede">
             I am a Doctoral Researcher in the
             <a href="https://research.cs.aalto.fi/pml/"
               >Probabilistic Machine Learning Group</a
@@ -126,15 +130,11 @@
             supervised by
             <a href="https://www.aalto.fi/en/people/samuel-kaski"
               >Prof. Samuel Kaski</a
-            >
-            (Aalto University,
-            <a href="https://www.manchester.ac.uk/">University of Manchester</a
-            >, and
-            <a href="https://www.ellisinstitute.fi/">ELLIS Institute Finland</a
-            >).
+            >. I develop amortized methods for fast Bayesian inference,
+            experimental design, and optimization.
           </p>
 
-          <nav aria-label="Contact and profiles">
+          <nav class="intro-nav" aria-label="Contact and profiles">
             <ul class="links">
               <li>
                 <a href="mailto:zhanghu.zhao@aalto.fi">
@@ -188,9 +188,9 @@
         <section aria-labelledby="research-h">
           <h2 id="research-h">Research</h2>
           <p>
-            My research develops amortized techniques to make Bayesian
-            inference, experimental design, and optimization fast enough to run
-            in the loop.
+            Amortization moves the cost of inference and design into an
+            offline training phase, so each new problem is answered
+            immediately, fast enough to run in the loop.
           </p>
           <h3 class="eyebrow" id="interests-h">Research interests</h3>
           <dl class="interests" aria-labelledby="interests-h">
@@ -204,8 +204,8 @@
             <div class="interest">
               <dt>Bayesian Experimental Design</dt>
               <dd>
-                Choosing informative experiments adaptively, fast enough to run
-                in the loop.
+                Choosing the next experiment adaptively, by how much it is
+                expected to reveal.
               </dd>
             </div>
             <div class="interest">
@@ -218,15 +218,69 @@
           </dl>
         </section>
 
+        <section aria-labelledby="pub-h">
+          <h2 id="pub-h">Publications</h2>
+          <!-- Each paper: year | title / authors / venue / one-line summary /
+               link slots. The title and every link slot are <a> elements:
+               without an href they render as inert "soon" placeholders, and
+               adding an href publishes them. Delete a slot you will not use.
+               Keep the year in the venue text (e.g. "NeurIPS 2026"), because
+               the year column is hidden on phones. -->
+          <ul class="pub-list">
+            <li class="pub" id="zhao2026amortized">
+              <span class="pub-year">2026</span>
+              <div class="pub-body">
+                <a class="pub-title"
+                  >Amortized Bayesian Experimental Design with In-Context
+                  Knowledge Conditioning</a
+                >
+                <span class="pub-authors"
+                  ><strong>Zhanghu Zhao</strong>, Daolang Huang, Xinyi Wen,
+                  Samuel Kaski</span
+                >
+                <span class="pub-venue"
+                  >NeurIPS 2026 <span class="pub-badge">Poster</span></span
+                >
+                <p class="pub-tldr">
+                  A design policy trained once that takes prior knowledge about
+                  the task in context, so it can choose informative experiments
+                  for a new problem in a single forward pass.
+                </p>
+                <ul class="pub-links" aria-label="Links for this paper">
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>
+                      Paper
+                    </a>
+                  </li>
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
+                      Code
+                    </a>
+                  </li>
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
+                      Project page
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </section>
+
         <section aria-labelledby="news-h">
           <h2 id="news-h">News</h2>
           <ul class="news-list">
             <li>
               <span class="news-date">2026.09</span>
               <span class="news-text"
-                >Our paper &ldquo;Amortized Bayesian Experimental Design with
-                In-Context Knowledge Conditioning&rdquo; has been accepted by
-                NeurIPS 2026!</span
+                >Our paper &ldquo;<a href="#zhao2026amortized"
+                  >Amortized Bayesian Experimental Design with In-Context
+                  Knowledge Conditioning</a
+                >&rdquo; has been accepted by NeurIPS 2026!</span
               >
             </li>
             <li>
@@ -241,7 +295,8 @@
               >
             </li>
             <!-- Add new items here as they happen (talks, preprints, awards).
-                 Keep the two spans: date, then text. -->
+                 Keep the two spans: date, then text. Link a paper to its
+                 entry above with href="#its-id". -->
           </ul>
         </section>
 
@@ -260,11 +315,7 @@
               <div class="education-content">
                 <span class="degree">Ph.D. in Computer Science</span><br />
                 <span class="school">Aalto University</span>
-                <span class="meta">· 2026 – 2030</span><br />
-                <span class="meta"
-                  >Probabilistic machine learning, Amortized inference, Bayesian
-                  experimental design</span
-                >
+                <span class="meta">· 2026 – present · expected 2030</span>
               </div>
             </li>
 
@@ -280,11 +331,7 @@
               <div class="education-content">
                 <span class="degree">M.Sc. in Business Analytics</span><br />
                 <span class="school">Aalto University</span>
-                <span class="meta">· 2024 – 2026</span><br />
-                <span class="meta"
-                  >Probabilistic machine learning, decision making under
-                  uncertainty</span
-                >
+                <span class="meta">· 2024 – 2026</span>
               </div>
             </li>
 
@@ -300,10 +347,7 @@
               <div class="education-content">
                 <span class="degree">M.Sc. in Computer Science</span><br />
                 <span class="school">University of Helsinki</span>
-                <span class="meta">· 2022 – 2024</span><br />
-                <span class="meta"
-                  >Machine learning and deep learning methods</span
-                >
+                <span class="meta">· 2022 – 2024</span>
               </div>
             </li>
 
@@ -321,32 +365,7 @@
                   >B.Sc. in Computer Science and Technology</span
                 ><br />
                 <span class="school">Soochow University</span>
-                <span class="meta">· 2017 – 2021</span><br />
-                <span class="meta"
-                  >Outstanding Graduate of Soochow University</span
-                >
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        <section aria-labelledby="pub-h">
-          <h2 id="pub-h">Publications</h2>
-          <ul class="pub-list">
-            <li class="pub">
-              <span class="pub-year">2026</span>
-              <div class="pub-body">
-                <span class="pub-title"
-                  >Amortized Bayesian Experimental Design with In-Context
-                  Knowledge Conditioning</span
-                >
-                <span class="pub-authors"
-                  ><strong>Zhanghu Zhao</strong>, Daolang Huang, Xinyi Wen,
-                  Samuel Kaski</span
-                >
-                <span class="pub-venue"
-                  >NeurIPS 2026 <span class="pub-badge">Poster</span></span
-                >
+                <span class="meta">· 2017 – 2021</span>
               </div>
             </li>
           </ul>
@@ -359,6 +378,10 @@
           <a href="https://jonbarron.info/">Jon Barron</a>. Last updated
           October 2026.
         </p>
+        <p class="theme-note">
+          Light by day, dark by night, following the sun over Helsinki. The
+          button in the corner overrides it.
+        </p>
       </footer>
     </div>
 
@@ -368,7 +391,7 @@
           <circle cx="12" cy="12" r="9" />
           <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" />
         </svg>
-        <span class="label i-auto">Auto</span>
+        <span class="label i-auto">Helsinki</span>
         <svg class="i-light" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
           <circle cx="12" cy="12" r="4.5" />
           <path d="M12 1.8v2.4M12 19.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M1.8 12h2.4M19.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />

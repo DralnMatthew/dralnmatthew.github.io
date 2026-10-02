@@ -37,9 +37,14 @@
   --photo-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
   --viewer-bg: #f5f5f5;
 
-  /* Reading column: wide enough that a news item is one line at 16px. */
-  --maxw: 1200px;
+  /* Reading column: about 100 characters at 16px, so the research
+     glosses and news items read as lines rather than ribbons. */
+  --maxw: 960px;
+  --maxw-cv: 1200px; /* the embedded PDF wants the room */
   --pad-x: 40px;
+
+  /* brief wash behind a publication when a link in News jumps to it */
+  --flash: rgba(21, 101, 192, 0.09);
 }
 
 :root[data-theme="dark"] {
@@ -63,6 +68,7 @@
   --photo-ring: rgba(255, 255, 255, 0.1);
   --photo-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
   --viewer-bg: #1b1f24;
+  --flash: rgba(121, 184, 255, 0.14);
 }
 
 /* ---------- Reset / base ---------- */
@@ -141,7 +147,8 @@ a:focus-visible {
 .wrap {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 48px var(--pad-x) 56px;
+  /* the bottom padding keeps the footer clear of the floating theme button */
+  padding: 48px var(--pad-x) 84px;
 }
 
 /* Sections sit between hairlines rather than under heavy headings. */
@@ -258,8 +265,10 @@ h2 {
 
 .interest {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  column-gap: 28px;
+  /* the topic column is just wide enough for the longest topic, so the
+     gloss starts next to it instead of across the page */
+  grid-template-columns: 17em minmax(0, 1fr);
+  column-gap: 24px;
   align-items: baseline;
   padding: 12px 0;
 }
@@ -369,7 +378,8 @@ h2 {
 
 /* ---------- Publications: year column, then title / authors / venue ----------
    The year sits in the same column as the News dates, so the two line up.
-   The title carries the weight; the authors stay small and muted. */
+   The title carries the weight; the authors stay small and muted. Under
+   the venue come a one-line summary and a row of link slots. */
 .pub-list {
   list-style: none;
   margin: 0;
@@ -381,10 +391,34 @@ h2 {
   grid-template-columns: 68px minmax(0, 1fr);
   column-gap: 12px;
   align-items: baseline;
+  border-radius: 6px;
+  scroll-margin-top: 24px; /* breathing room when News jumps here */
 }
 
 .pub + .pub {
-  margin-top: 18px;
+  margin-top: 22px;
+}
+
+/* a link in News lands here: wash the entry briefly so the eye finds it */
+@keyframes pub-flash {
+  from {
+    background-color: var(--flash);
+    box-shadow: 0 0 0 10px var(--flash);
+  }
+  to {
+    background-color: transparent;
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.pub:target {
+  animation: pub-flash 2.4s ease-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pub:target {
+    animation: none;
+  }
 }
 
 .pub-year {
@@ -398,12 +432,23 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+/* The title is an <a>. Without an href it is inert and reads as text;
+   give it one and it links to the paper. */
 .pub-title {
   display: block;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: -0.01em;
   color: var(--ink-strong);
+}
+
+.pub-title:not([href]) {
+  color: var(--ink-strong);
+  text-decoration: none;
+}
+
+.pub-title[href]:hover {
+  color: var(--link);
 }
 
 .pub-authors {
@@ -443,12 +488,90 @@ h2 {
   text-transform: uppercase;
 }
 
+/* one sentence on what the paper contributes, for readers outside the field */
+.pub-tldr {
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* ---------- Link slots: Paper / Code / Project page ----------
+   Small outlined pills. A slot without an href is a placeholder: dashed,
+   muted, tagged "soon", and not focusable. Adding the href publishes it. */
+.pub-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 11px 3px 9px;
+  border: 1px solid var(--btn-border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.pub-link svg {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.pub-link[href]:hover {
+  color: var(--link);
+  border-color: var(--link);
+  text-decoration: none;
+}
+
+.pub-link[href]:hover svg {
+  color: inherit;
+}
+
+.pub-link:not([href]) {
+  border-style: dashed;
+  color: var(--muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.pub-link:not([href])::after {
+  content: "soon";
+  padding: 3px 5px 2px;
+  border-radius: 3px;
+  background: var(--rule-soft);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 /* ---------- Footer ---------- */
 .site-footer {
   padding-top: 20px;
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: 13.5px;
+}
+.site-footer p {
+  margin: 0;
+}
+.site-footer .theme-note {
+  margin-top: 4px;
 }
 .site-footer a {
   color: var(--muted);
@@ -459,30 +582,61 @@ h2 {
   color: var(--link);
 }
 
+/* without JavaScript there is no automatic theme to explain */
+:root:not([data-mode]) .theme-note {
+  display: none;
+}
+
 /* ============================================================
    Responsive — tablets and phones
    ============================================================ */
 @media (max-width: 680px) {
   .wrap {
-    padding: 32px 20px 48px;
+    padding: 28px 20px 76px;
   }
 
+  /* A compact header: the photo beside the name, then the paragraph and
+     the links across the full width, all left-aligned. The text wrapper
+     dissolves (display: contents) so its children can take grid areas. */
   .intro {
-    flex-direction: column-reverse; /* photo on top, text below */
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    grid-template-areas:
+      "photo name"
+      "lede lede"
+      "links links";
+    gap: 0 18px;
     align-items: center;
-    text-align: center;
-    gap: 18px;
-    padding-bottom: 28px;
+    padding-bottom: 24px;
+  }
+
+  .intro-text {
+    display: contents;
   }
 
   .intro-photo {
-    width: 128px;
-    max-width: 45%;
+    grid-area: photo;
+    width: 84px;
+    max-width: none;
+  }
+
+  .name {
+    grid-area: name;
+    margin: 0;
+  }
+
+  .intro-text .intro-lede {
+    grid-area: lede;
+    margin: 18px 0 0;
+  }
+
+  .intro-nav {
+    grid-area: links;
   }
 
   .links {
-    justify-content: center;
-    gap: 2px 18px;
+    margin-top: 8px;
+    gap: 0 16px;
   }
 
   /* roomier tap targets on the primary contact row */
@@ -491,7 +645,7 @@ h2 {
   }
 
   main > section {
-    padding: 26px 0 28px;
+    padding: 24px 0 26px;
   }
 
   .interest {
@@ -499,10 +653,23 @@ h2 {
     row-gap: 2px;
   }
 
-  .news-list li,
-  .pub {
+  .news-list li {
     grid-template-columns: 64px minmax(0, 1fr);
     column-gap: 10px;
+  }
+
+  /* The year column would squeeze long titles, so it goes; the venue
+     line ("NeurIPS 2026") carries the year instead. */
+  .pub {
+    display: block;
+  }
+
+  .pub-year {
+    display: none;
+  }
+
+  .pub + .pub {
+    margin-top: 20px;
   }
 
   .education-item {
@@ -522,7 +689,7 @@ h2 {
    viewer inside the iframe; the toolbar only adds "Open PDF".
    ============================================================ */
 .cv-page {
-  max-width: var(--maxw);
+  max-width: var(--maxw-cv);
   margin: 0 auto;
   padding: 24px var(--pad-x) 40px;
 }
