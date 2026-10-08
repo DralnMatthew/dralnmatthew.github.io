@@ -4,32 +4,32 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>CV — Zhanghu Zhao</title>
+    <title>Publications — Zhanghu Zhao</title>
     <meta name="author" content="Zhanghu Zhao" />
     <meta
       name="description"
-      content="Curriculum Vitae of Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University."
+      content="Publications of Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized methods for fast Bayesian inference, experimental design, and optimization."
     />
 
-    <link rel="canonical" href="https://zhanghu-zhao.com/cv/" />
+    <link rel="canonical" href="https://zhanghu-zhao.com/publications/" />
 
-    <meta property="og:type" content="profile" />
-    <meta property="og:title" content="CV — Zhanghu Zhao" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Publications — Zhanghu Zhao" />
     <meta
       property="og:description"
-      content="Curriculum Vitae of Zhanghu Zhao — Doctoral Researcher at Aalto University."
+      content="Publications of Zhanghu Zhao — Doctoral Researcher at Aalto University."
     />
-    <meta property="og:url" content="https://zhanghu-zhao.com/cv/" />
+    <meta property="og:url" content="https://zhanghu-zhao.com/publications/" />
     <meta
       property="og:image"
       content="https://zhanghu-zhao.com/images/ZhanghuZhao-sm.jpg"
     />
 
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="CV — Zhanghu Zhao" />
+    <meta name="twitter:title" content="Publications — Zhanghu Zhao" />
     <meta
       name="twitter:description"
-      content="Curriculum Vitae of Zhanghu Zhao — Doctoral Researcher at Aalto University."
+      content="Publications of Zhanghu Zhao — Doctoral Researcher at Aalto University."
     />
     <meta
       name="twitter:image"
@@ -145,42 +145,64 @@
            cv/index.html: a change to either goes in all three. -->
       <nav class="tabs" aria-label="Pages">
         <a href="../">About</a>
-        <a href="../publications/">Publications</a>
-        <a href="./" aria-current="page">CV</a>
+        <a href="./" aria-current="page">Publications</a>
+        <a href="../cv/">CV</a>
       </nav>
 
       <main id="main">
-        <section aria-labelledby="cv-h">
-          <div class="section-head">
-            <h2 id="cv-h">Curriculum Vitae</h2>
-            <a
-              class="section-action"
-              href="../data/Zhanghu_Zhao_CV_PHD.pdf"
-              target="_blank"
-              rel="noopener"
-              >Open PDF &#8599;</a
-            >
-          </div>
-
-          <!-- The zoom and page controls come from the browser's built-in
-               PDF viewer inside the iframe. -->
-          <iframe
-            id="cv"
-            class="cv-viewer"
-            src="../data/Zhanghu_Zhao_CV_PHD.pdf#view=FitH"
-            title="Curriculum Vitae of Zhanghu Zhao (PDF)"
-          ></iframe>
-
-          <p class="cv-fallback">
-            Preview not showing? Some mobile browsers cannot render embedded
-            PDFs —
-            <a
-              href="../data/Zhanghu_Zhao_CV_PHD.pdf"
-              target="_blank"
-              rel="noopener"
-              >open the PDF directly</a
-            >.
-          </p>
+        <section aria-labelledby="pub-h">
+          <h2 id="pub-h">Publications</h2>
+          <!-- Each paper: year | title / authors / venue / one-line summary /
+               link slots. The title and every link slot are <a> elements:
+               without an href they render as inert "soon" placeholders, and
+               adding an href publishes them. Delete a slot you will not use.
+               Keep the year in the venue text (e.g. "NeurIPS 2026"), because
+               the year column is hidden on phones. Give each paper an id, so
+               that a News item on the homepage can link to it with
+               href="publications/#its-id". -->
+          <ul class="pub-list">
+            <li class="pub" id="zhao2026amortized">
+              <span class="pub-year">2026</span>
+              <div class="pub-body">
+                <a class="pub-title"
+                  >Amortized Bayesian Experimental Design with In-Context
+                  Knowledge Conditioning</a
+                >
+                <span class="pub-authors"
+                  ><strong>Zhanghu Zhao</strong>, Daolang Huang, Xinyi Wen,
+                  Samuel Kaski</span
+                >
+                <span class="pub-venue"
+                  >NeurIPS 2026 <span class="pub-badge">Poster</span></span
+                >
+                <p class="pub-tldr">
+                  A design policy trained once that takes prior knowledge about
+                  the task in context, so it can choose informative experiments
+                  for a new problem in a single forward pass.
+                </p>
+                <ul class="pub-links" aria-label="Links for this paper">
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>
+                      Paper
+                    </a>
+                  </li>
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
+                      Code
+                    </a>
+                  </li>
+                  <li>
+                    <a class="pub-link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
+                      Project page
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
         </section>
       </main>
 
