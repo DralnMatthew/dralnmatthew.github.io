@@ -146,8 +146,30 @@ a:focus-visible {
 .wrap {
   max-width: var(--maxw);
   margin: 0 auto;
+  padding: 48px var(--pad-x) 0;
+}
+
+/* Everything under the header: the tabs, the page itself and the footer.
+   The Publications and CV tabs link to its id, #content, so a click opens
+   the page scrolled down to here, the tabs --gap-above from the top of the
+   screen and the header out of view. While it is the target it is at
+   least a screen tall, so a short page can still scroll that far, and its
+   footer then sits at the bottom of the screen. */
+.page-body {
+  --gap-above: 24px;
+  display: flex;
+  flex-direction: column;
   /* the bottom padding keeps the footer clear of the floating theme button */
-  padding: 48px var(--pad-x) 84px;
+  padding-bottom: 84px;
+  scroll-margin-top: var(--gap-above);
+}
+
+.page-body:target {
+  min-height: calc(100vh - var(--gap-above));
+}
+
+.page-body > main {
+  flex: 1 0 auto; /* the footer goes to the bottom of a screen-tall block */
 }
 
 /* Sections sit between hairlines rather than under heavy headings. */
@@ -655,7 +677,11 @@ h2 {
    ============================================================ */
 @media (max-width: 680px) {
   .wrap {
-    padding: 28px 20px 76px;
+    padding: 28px 20px 0;
+  }
+
+  .page-body {
+    padding-bottom: 76px;
   }
 
   /* A compact header: the photo beside the name, then the paragraph and

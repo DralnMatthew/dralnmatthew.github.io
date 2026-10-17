@@ -8,7 +8,7 @@
     <meta name="author" content="Zhanghu Zhao" />
     <meta
       name="description"
-      content="Publications of Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized methods for fast Bayesian inference, experimental design, and optimization."
+      content="Publications of Zhanghu Zhao — Doctoral Researcher in the Probabilistic Machine Learning Group at Aalto University. Amortized methods for fast Bayesian inference and experimental design."
     />
 
     <link rel="canonical" href="https://zhanghu-zhao.com/publications/" />
@@ -65,7 +65,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=16" />
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=17" />
 
     <!-- Theme: set before first paint by theme.js, so no flash of the
          wrong scheme. Light by day, dark by night, following Helsinki. -->
@@ -91,8 +91,8 @@
             supervised by
             <a href="https://www.aalto.fi/en/people/samuel-kaski"
               >Prof. Samuel Kaski</a
-            >. I develop amortized methods for fast Bayesian inference,
-            experimental design, and optimization.
+            >. I develop amortized methods for fast Bayesian inference and
+            experimental design.
           </p>
 
           <nav class="intro-nav" aria-label="Contact and profiles">
@@ -139,84 +139,90 @@
         </div>
       </header>
 
-      <!-- Page tabs. Every tab is a link to a page; the current page's
-           tab carries aria-current="page". The header above and this strip
-           are the same in index.html, publications/index.html and
-           cv/index.html: a change to either goes in all three. -->
-      <nav class="tabs" aria-label="Pages">
-        <a href="../">About</a>
-        <a href="./" aria-current="page">Publications</a>
-        <a href="../cv/">CV</a>
-      </nav>
+      <!-- Everything under the header: the tabs, the page itself and the
+           footer. The Publications and CV tabs link to #content, so a click
+           opens that page scrolled down to the tabs, with the header out of
+           view; About opens the homepage at the top. -->
+      <div class="page-body" id="content">
+        <!-- Page tabs. Every tab is a link to a page; the current page's
+             tab carries aria-current="page". The header above and this
+             strip are the same in index.html, publications/index.html and
+             cv/index.html: a change to either goes in all three. -->
+        <nav class="tabs" aria-label="Pages">
+          <a href="../">About</a>
+          <a href="./#content" aria-current="page">Publications</a>
+          <a href="../cv/#content">CV</a>
+        </nav>
 
-      <main id="main">
-        <section aria-labelledby="pub-h">
-          <h2 id="pub-h">Publications</h2>
-          <!-- Each paper: year | title / authors / venue / one-line summary /
-               link slots. The title and every link slot are <a> elements:
-               without an href they render as inert "soon" placeholders, and
-               adding an href publishes them. Delete a slot you will not use.
-               Keep the year in the venue text (e.g. "NeurIPS 2026"), because
-               the year column is hidden on phones. Give each paper an id, so
-               that a News item on the homepage can link to it with
-               href="publications/#its-id". -->
-          <ul class="pub-list">
-            <li class="pub" id="zhao2026amortized">
-              <span class="pub-year">2026</span>
-              <div class="pub-body">
-                <a class="pub-title"
-                  >Amortized Bayesian Experimental Design with In-Context
-                  Knowledge Conditioning</a
-                >
-                <span class="pub-authors"
-                  ><strong>Zhanghu Zhao</strong>, Daolang Huang, Xinyi Wen,
-                  Samuel Kaski</span
-                >
-                <span class="pub-venue"
-                  >NeurIPS 2026 <span class="pub-badge">Poster</span></span
-                >
-                <p class="pub-tldr">
-                  A design policy trained once that takes prior knowledge about
-                  the task in context, so it can choose informative experiments
-                  for a new problem in a single forward pass.
-                </p>
-                <ul class="pub-links" aria-label="Links for this paper">
-                  <li>
-                    <a class="pub-link">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>
-                      Paper
-                    </a>
-                  </li>
-                  <li>
-                    <a class="pub-link">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
-                      Code
-                    </a>
-                  </li>
-                  <li>
-                    <a class="pub-link">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
-                      Project page
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-        </section>
-      </main>
+        <main id="main">
+          <section aria-labelledby="pub-h">
+            <h2 id="pub-h">Publications</h2>
+            <!-- Each paper: year | title / authors / venue / one-line summary /
+                 link slots. The title and every link slot are <a> elements:
+                 without an href they render as inert "soon" placeholders, and
+                 adding an href publishes them. Delete a slot you will not use.
+                 Keep the year in the venue text (e.g. "NeurIPS 2026"), because
+                 the year column is hidden on phones. Give each paper an id, so
+                 that a News item on the homepage can link to it with
+                 href="publications/#its-id". -->
+            <ul class="pub-list">
+              <li class="pub" id="zhao2026amortized">
+                <span class="pub-year">2026</span>
+                <div class="pub-body">
+                  <a class="pub-title"
+                    >Amortized Bayesian Experimental Design with In-Context
+                    Knowledge Conditioning</a
+                  >
+                  <span class="pub-authors"
+                    ><strong>Zhanghu Zhao</strong>, Daolang Huang, Xinyi Wen,
+                    Samuel Kaski</span
+                  >
+                  <span class="pub-venue"
+                    >NeurIPS 2026 <span class="pub-badge">Poster</span></span
+                  >
+                  <p class="pub-tldr">
+                    A design policy trained once that takes prior knowledge about
+                    the task in context, so it can choose informative experiments
+                    for a new problem in a single forward pass.
+                  </p>
+                  <ul class="pub-links" aria-label="Links for this paper">
+                    <li>
+                      <a class="pub-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>
+                        Paper
+                      </a>
+                    </li>
+                    <li>
+                      <a class="pub-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
+                        Code
+                      </a>
+                    </li>
+                    <li>
+                      <a class="pub-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7" /><path d="M7 7h10v10" /></svg>
+                        Project page
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </section>
+        </main>
 
-      <footer class="site-footer">
-        <p>
-          Template adapted from
-          <a href="https://jonbarron.info/">Jon Barron</a>. Last updated
-          October 2026.
-        </p>
-        <p class="theme-note">
-          Light by day, dark by night, following the sun over Helsinki. The
-          button in the corner overrides it.
-        </p>
-      </footer>
+        <footer class="site-footer">
+          <p>
+            Template adapted from
+            <a href="https://jonbarron.info/">Jon Barron</a>. Last updated
+            October 2026.
+          </p>
+          <p class="theme-note">
+            Light by day, dark by night, following the sun over Helsinki. The
+            button in the corner overrides it.
+          </p>
+        </footer>
+      </div>
     </div>
 
     <div class="theme-dock">

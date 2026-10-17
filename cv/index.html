@@ -65,7 +65,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=16" />
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css?v=17" />
 
     <!-- Theme: set before first paint by theme.js, so no flash of the
          wrong scheme. Light by day, dark by night, following Helsinki. -->
@@ -91,8 +91,8 @@
             supervised by
             <a href="https://www.aalto.fi/en/people/samuel-kaski"
               >Prof. Samuel Kaski</a
-            >. I develop amortized methods for fast Bayesian inference,
-            experimental design, and optimization.
+            >. I develop amortized methods for fast Bayesian inference and
+            experimental design.
           </p>
 
           <nav class="intro-nav" aria-label="Contact and profiles">
@@ -139,62 +139,68 @@
         </div>
       </header>
 
-      <!-- Page tabs. Every tab is a link to a page; the current page's
-           tab carries aria-current="page". The header above and this strip
-           are the same in index.html, publications/index.html and
-           cv/index.html: a change to either goes in all three. -->
-      <nav class="tabs" aria-label="Pages">
-        <a href="../">About</a>
-        <a href="../publications/">Publications</a>
-        <a href="./" aria-current="page">CV</a>
-      </nav>
+      <!-- Everything under the header: the tabs, the page itself and the
+           footer. The Publications and CV tabs link to #content, so a click
+           opens that page scrolled down to the tabs, with the header out of
+           view; About opens the homepage at the top. -->
+      <div class="page-body" id="content">
+        <!-- Page tabs. Every tab is a link to a page; the current page's
+             tab carries aria-current="page". The header above and this
+             strip are the same in index.html, publications/index.html and
+             cv/index.html: a change to either goes in all three. -->
+        <nav class="tabs" aria-label="Pages">
+          <a href="../">About</a>
+          <a href="../publications/#content">Publications</a>
+          <a href="./#content" aria-current="page">CV</a>
+        </nav>
 
-      <main id="main">
-        <section aria-labelledby="cv-h">
-          <div class="section-head">
-            <h2 id="cv-h">Curriculum Vitae</h2>
-            <a
-              class="section-action"
-              href="../data/Zhanghu_Zhao_CV_PHD.pdf"
-              target="_blank"
-              rel="noopener"
-              >Open PDF &#8599;</a
-            >
-          </div>
+        <main id="main">
+          <section aria-labelledby="cv-h">
+            <div class="section-head">
+              <h2 id="cv-h">Curriculum Vitae</h2>
+              <a
+                class="section-action"
+                href="../data/Zhanghu_Zhao_CV_PHD.pdf"
+                target="_blank"
+                rel="noopener"
+                >Open PDF &#8599;</a
+              >
+            </div>
 
-          <!-- The zoom and page controls come from the browser's built-in
-               PDF viewer inside the iframe. -->
-          <iframe
-            id="cv"
-            class="cv-viewer"
-            src="../data/Zhanghu_Zhao_CV_PHD.pdf#view=FitH"
-            title="Curriculum Vitae of Zhanghu Zhao (PDF)"
-          ></iframe>
+            <!-- The zoom and page controls come from the browser's built-in
+                 PDF viewer inside the iframe. -->
+            <iframe
+              id="cv"
+              class="cv-viewer"
+              src="../data/Zhanghu_Zhao_CV_PHD.pdf#view=FitH"
+              title="Curriculum Vitae of Zhanghu Zhao (PDF)"
+            ></iframe>
 
-          <p class="cv-fallback">
-            Preview not showing? Some mobile browsers cannot render embedded
-            PDFs —
-            <a
-              href="../data/Zhanghu_Zhao_CV_PHD.pdf"
-              target="_blank"
-              rel="noopener"
-              >open the PDF directly</a
-            >.
+            <p class="cv-fallback">
+              Preview not showing? Some mobile browsers cannot render embedded
+              PDFs —
+              <a
+                href="../data/Zhanghu_Zhao_CV_PHD.pdf"
+                target="_blank"
+                rel="noopener"
+                >open the PDF directly</a
+              >.
+            </p>
+          </section>
+        </main>
+
+        <footer class="site-footer">
+          <p>
+            Template adapted from
+            <a href="https://jonbarron.info/">Jon Barron</a>. Last updated
+            October 2026.
           </p>
-        </section>
-      </main>
-
-      <footer class="site-footer">
-        <p>
-          Template adapted from
-          <a href="https://jonbarron.info/">Jon Barron</a>. Last updated
-          October 2026.
-        </p>
-        <p class="theme-note">
-          Light by day, dark by night, following the sun over Helsinki. The
-          button in the corner overrides it.
-        </p>
-      </footer>
+          <p class="theme-note">
+            Light by day, dark by night, following the sun over Helsinki. The
+            button in the corner overrides it.
+          </p>
+        </footer>
+      </div>
     </div>
 
     <div class="theme-dock">

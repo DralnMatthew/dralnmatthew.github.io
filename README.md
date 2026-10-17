@@ -18,6 +18,14 @@ link to its page, and the current page's tab carries
 the three files, so a change to either goes in all three. When you add a
 page, add its tab to all three files as well.
 
+Everything under the header (the tabs, the page itself and the footer)
+sits in `<div class="page-body" id="content">`. The Publications and CV
+tabs link to `#content` on their page, so a click opens the page
+scrolled down to the tabs, with the header out of view. About opens the
+homepage at the top. While `#content` is the target, the block is at
+least a screen tall, so even a short page can scroll that far. Link a
+new tab to `#content` on its page in the same way.
+
 To update the CV, replace the PDF. If the file name changes, update the
 three links to it in `cv/index.html`.
 
