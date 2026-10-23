@@ -1,0 +1,1818 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>IMBUE: Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning</title>
+    <meta
+      name="description"
+      content="IMBUE (NeurIPS 2026) lets an amortized Bayesian experimental design policy take user-specified priors and observations from previous instances at deployment, without retraining, and filters out unreliable ones."
+    />
+    <meta name="author" content="Zhanghu Zhao, Daolang Huang, Xinyi Wen, Samuel Kaski" />
+
+    <!-- The absolute URLs below (canonical, social cards, Scholar PDF) assume
+         the page is served at https://zhanghu-zhao.com/imbue/. Update them
+         together if the page moves. -->
+    <link rel="canonical" href="https://zhanghu-zhao.com/imbue/" />
+
+    <!-- Social cards: Open Graph (LinkedIn, Slack, ...) and X/Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Zhanghu Zhao" />
+    <meta
+      property="og:title"
+      content="IMBUE: Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning"
+    />
+    <meta
+      property="og:description"
+      content="Use priors and past experiments at deployment, without retraining: an amortized BED policy takes user-specified priors and observations from previous instances as extra input tokens, and a learned filter excludes unreliable ones. NeurIPS 2026."
+    />
+    <meta property="og:url" content="https://zhanghu-zhao.com/imbue/" />
+    <meta property="og:image" content="https://zhanghu-zhao.com/imbue/static/images/social-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="IMBUE, NeurIPS 2026: use priors and past experiments at deployment, without retraining. Beside the text, the IMBUE panel of the overview figure: prior, previous-instance and observation tokens pass a reliability filter, then a Transformer that proposes the next design."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="IMBUE: Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning"
+    />
+    <meta
+      name="twitter:description"
+      content="Use priors and past experiments at deployment, without retraining: an amortized BED policy takes user-specified priors and observations from previous instances as extra input tokens, and a learned filter excludes unreliable ones. NeurIPS 2026."
+    />
+    <meta name="twitter:image" content="https://zhanghu-zhao.com/imbue/static/images/social-card.png" />
+    <meta
+      name="twitter:image:alt"
+      content="IMBUE, NeurIPS 2026: use priors and past experiments at deployment, without retraining. Beside the text, the IMBUE panel of the overview figure: prior, previous-instance and observation tokens pass a reliability filter, then a Transformer that proposes the next design."
+    />
+
+    <!-- Google Scholar reads these to index the paper and its PDF. -->
+    <meta
+      name="citation_title"
+      content="Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning"
+    />
+    <meta name="citation_author" content="Zhao, Zhanghu" />
+    <meta name="citation_author" content="Huang, Daolang" />
+    <meta name="citation_author" content="Wen, Xinyi" />
+    <meta name="citation_author" content="Kaski, Samuel" />
+    <meta name="citation_conference_title" content="Advances in Neural Information Processing Systems" />
+    <meta name="citation_publication_date" content="2026" />
+    <meta
+      name="citation_pdf_url"
+      content="https://zhanghu-zhao.com/imbue/static/pdfs/IMBUE_camera_ready.pdf"
+    />
+
+    <!-- Favicons: the site's own, since this page lives inside zhanghu-zhao.com -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon/favicon-16x16.png" />
+    <link rel="shortcut icon" href="../images/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../images/favicon/apple-touch-icon.png" />
+
+    <!-- script.js sets the light/dark theme before the first paint, so it
+         loads synchronously here; everything else in it waits for the DOM. -->
+    <meta name="theme-color" content="#ffffff" />
+    <script src="script.js?v=2"></script>
+
+    <!-- Fonts: Inter, falling back to the system UI stack (see style.css) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css?v=2" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <!-- ============================================================
+         Top bar: section links and the theme toggle, stuck to the top
+         of the window. Without JavaScript the links still work; the
+         toggle stays hidden and no link is marked as current.
+         ============================================================ -->
+    <nav class="topbar" aria-label="Sections">
+      <div class="topbar__inner">
+        <a class="topbar__name" href="#top" aria-label="IMBUE, back to the top">IMBUE</a>
+        <ul class="topbar__links">
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#method">Method</a></li>
+          <li><a href="#results">Results</a></li>
+          <li><a href="#citation">Citation</a></li>
+        </ul>
+        <!-- Theme toggle: Helsinki daylight → light → dark, as on the rest of the site -->
+        <button type="button" class="theme-toggle">
+          <svg class="i-auto" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" />
+          </svg>
+          <span class="label i-auto">Helsinki</span>
+          <svg class="i-light" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.5" />
+            <path d="M12 1.8v2.4M12 19.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M1.8 12h2.4M19.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+          </svg>
+          <span class="label i-light">Light</span>
+          <svg class="i-dark" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.5 14.6A8.5 8.5 0 1 1 9.4 3.5a6.6 6.6 0 0 0 11.1 11.1z" />
+          </svg>
+          <span class="label i-dark">Dark</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ============================================================
+         Header: venue, name and claim, title, authors, link buttons
+         ============================================================ -->
+    <header class="hero" id="top">
+      <div class="container">
+        <p class="venue">NeurIPS 2026</p>
+        <!-- The name and a one-line claim come first. The paper's title
+             stays the page's h1; the acronym's expansion sits under it. -->
+        <hgroup class="hero__titles">
+          <p class="hero__name">IMBUE</p>
+          <p class="hero__claim">Use priors and past experiments at deployment, without retraining.</p>
+          <h1 class="title">
+            Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning
+          </h1>
+          <p class="acronym">
+            <b>I</b>n-context a<b>M</b>ortized <b>B</b>ED with <b>U</b>nified knowledge <b>E</b>ncoding
+          </p>
+        </hgroup>
+
+        <!-- Superscripts point into the affiliation list below.
+             TODO: Daolang Huang 与 Xinyi Wen 的主页取自 examples/sites/ 里 2026-10-02 保存的参考快照，
+             Samuel Kaski 的链接取自本站首页；请确认三者无误。 -->
+        <ul class="authors" aria-label="Authors">
+          <li><a href="https://zhanghu-zhao.com/">Zhanghu Zhao</a><sup>1,2</sup></li>
+          <li><a href="https://www.huangdaolang.com/">Daolang Huang</a><sup>1,2</sup></li>
+          <li><a href="https://e-wxy.vercel.app/">Xinyi Wen</a><sup>1,2,3</sup></li>
+          <li><a href="https://www.aalto.fi/en/people/samuel-kaski">Samuel Kaski</a><sup>1,2,4</sup></li>
+        </ul>
+        <!-- On phones the department and country (.aff-long) are left out. -->
+        <ul class="affiliations" aria-label="Affiliations">
+          <li><sup>1</sup>ELLIS Institute Finland</li>
+          <li><sup>2</sup><span class="aff-long">Department of Computer Science, </span>Aalto University<span class="aff-long">, Finland</span></li>
+          <li><sup>3</sup><span class="aff-long">Department of Computer Science, </span>University of Helsinki<span class="aff-long">, Finland</span></li>
+          <li><sup>4</sup><span class="aff-long">Department of Computer Science, </span>University of Manchester<span class="aff-long">, UK</span></li>
+        </ul>
+        <!-- TODO: 论文未标注共同一作或通讯作者。如需标注，在对应作者的 <sup> 后加 * 或 †，
+             并在这里加一行：<p class="author-note"><sup>*</sup>Equal contribution</p> -->
+
+        <!-- Link buttons. A button without an href is an inert "soon"
+             placeholder (same convention as the Publications page): add the
+             href to publish it. Links we do not have are left out entirely;
+             ready-made buttons for them are in the comment after Cite. -->
+        <nav aria-label="Paper resources">
+          <ul class="buttons">
+            <li>
+              <a class="btn" href="static/pdfs/IMBUE_camera_ready.pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>
+                Paper
+              </a>
+            </li>
+            <li>
+              <!-- TODO: 论文写的代码地址是 https://github.com/DralnMatthew/IMBUE ，
+                   2026-10-17、10-19 访问均返回 404（仓库未公开或尚未创建）。公开后在下面的 <a> 上加
+                   href="https://github.com/DralnMatthew/IMBUE"，"soon" 标记会自动消失。 -->
+              <a class="btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg>
+                Code
+              </a>
+            </li>
+            <li>
+              <a class="btn" href="#citation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /></svg>
+                Cite
+              </a>
+            </li>
+            <!-- TODO: 暂无 arXiv / OpenReview、Video、Poster、Data、Demo 链接。
+                 有了之后把对应的 <li> 复制到上面（顺序：Paper, arXiv, Code, Video, Poster, Data, Demo，Cite 放最后），
+                 再填上 href：
+
+            <li>
+              <a class="btn" href="https://arxiv.org/abs/XXXX.XXXXX">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /><path d="M10 12h4" /></svg>
+                arXiv
+              </a>
+            </li>
+            <li>
+              <a class="btn" href="#video">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m10 8 6 4-6 4z" /></svg>
+                Video
+              </a>
+            </li>
+            <li>
+              <a class="btn" href="static/pdfs/POSTER_FILE.pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h20" /><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" /><path d="m7 21 5-5 5 5" /></svg>
+                Poster
+              </a>
+            </li>
+            <li>
+              <a class="btn" href="DATA_URL">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14a9 3 0 0 0 18 0V5" /><path d="M3 12a9 3 0 0 0 18 0" /></svg>
+                Data
+              </a>
+            </li>
+            <li>
+              <a class="btn" href="DEMO_URL">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8" /><path d="M12 17v4" /><path d="m10 7.5 4.5 2.5-4.5 2.5z" /></svg>
+                Demo
+              </a>
+            </li>
+            -->
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ============================================================
+           Overview: the paper's overview figure. Phones get the same
+           three panels stacked (overview-mobile.png, built from the PDF
+           by _tools/pdflayout.js), so the lettering stays readable.
+           ============================================================ -->
+      <section id="overview" class="teaser" aria-labelledby="overview-title">
+        <div class="container">
+          <h2 id="overview-title" class="visually-hidden">Overview</h2>
+          <figure class="figure">
+            <a class="figure__frame zoom" href="static/images/overview.png" title="Enlarge figure">
+              <picture>
+                <source media="(max-width: 600px)" srcset="static/images/overview-mobile.png" width="1080" height="2973" />
+                <img
+                  src="static/images/overview.png"
+                  width="2160"
+                  height="990"
+                  fetchpriority="high"
+                  decoding="async"
+                  alt="Overview of IMBUE in three panels. Traditional amortized BED: a policy maps observations to designs, while prior information and auxiliary data cannot reach it (crossed-out arrows). IMBUE: prior information, auxiliary data and observations become tokens that pass through a reliability filter, which fades out some of them, and then a Transformer that proposes the next design. Reliable and misleading information: schematic curves of expected information gain; with reliable information IMBUE rises faster than a policy without external information, with misleading information the two curves nearly coincide."
+                />
+              </picture>
+            </a>
+            <figcaption>
+              <p class="teaser__lead">
+                IMBUE lets a trained design policy incorporate knowledge supplied at deployment,
+                without retraining: user-specified priors and observations from previous instances
+                enter as extra input tokens, and a learned reliability filter excludes the ones that
+                are inconsistent with the observations.
+              </p>
+              <p>
+                <b>Traditional amortized BED:</b> existing policies fail to encode additional
+                information available at deployment. <b>IMBUE:</b> external knowledge is encoded as
+                additional input tokens, together with a reliability filter that excludes unreliable
+                information. <b>Reliable and misleading information:</b> IMBUE accelerates early
+                information acquisition when external information is reliable, and stays close to a
+                policy without external information when it is misleading.
+              </p>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Key findings: the results in brief, each linked to its
+           evidence further down, beside one representative plot (the
+           Location Finding figure of Results, with numbered marks).
+           ============================================================ -->
+      <section id="findings" class="section findings" aria-labelledby="findings-title">
+        <div class="container">
+          <h2 id="findings-title">Key findings</h2>
+          <div class="findings__layout">
+            <ol class="findings__list" role="list">
+              <li class="findings__item">
+                <h3><span class="findings__num" aria-hidden="true">1</span>Reliable knowledge pays off early</h3>
+                <p>
+                  With a strong prior, IMBUE runs ahead of ALINE, a policy that takes no external
+                  knowledge, through the early and middle rollout and reaches ALINE's final sPCE
+                  several steps earlier. On CES, five relevant previous instances raise its sPCE from
+                  13.46 to 13.93.
+                </p>
+                <p class="findings__links"><a href="#f-accel">Results: reliable knowledge</a></p>
+              </li>
+              <li class="findings__item">
+                <h3><span class="findings__num" aria-hidden="true">2</span>Robust to unreliable knowledge, even when mixed in</h3>
+                <p>
+                  As more of five previous instances turn out irrelevant, IMBUE's final error on GP
+                  active learning stays essentially flat, while naive concatenation and a multi-task
+                  GP degrade. Given a miscalibrated prior or only irrelevant instances, IMBUE stays
+                  close to the no-external baseline.
+                </p>
+                <p class="findings__links">
+                  <a href="#f-mixed">Results: mixed inputs</a>
+                  <a href="#f-robust">Results: unreliable inputs</a>
+                </p>
+              </li>
+              <li class="findings__item">
+                <h3><span class="findings__num" aria-hidden="true">3</span>No retraining at deployment</h3>
+                <p>
+                  Priors and previous instances enter the trained policy as extra input tokens; with
+                  none supplied, it reduces to a policy that sees only the experimental history. On
+                  CES with five previous instances, a design step takes 4.57&nbsp;ms on an H100, filter
+                  included.
+                </p>
+                <p class="findings__links">
+                  <a href="#method">Method</a>
+                  <a href="#more-compute">More results: compute</a>
+                </p>
+              </li>
+            </ol>
+            <figure class="figure findings__figure">
+              <a class="figure__frame zoom" href="static/images/location/location_spce_baselines.png" title="Enlarge figure">
+                <span class="figure__canvas">
+                  <img
+                    src="static/images/location/location_spce_baselines.png"
+                    width="1200"
+                    height="1132"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Line chart of sPCE over 20 steps on Location Finding. IMBUE with strong priors rises fastest and stays on top; ALINE and IMBUE with miscalibrated priors follow close together; RL-BOED, DAD and Random end progressively lower."
+                  />
+                  <span class="mark" style="--x: 0.45; --y: 0.19" aria-hidden="true">1</span>
+                  <span class="mark" style="--x: 0.875; --y: 0.12" aria-hidden="true">2</span>
+                </span>
+              </a>
+              <figcaption>
+                <b>One trained policy, two priors.</b> Given a strong prior, IMBUE pulls ahead of
+                ALINE early<span class="mark-ref" aria-hidden="true"> (mark 1)</span>; given a
+                miscalibrated prior, it stays close to ALINE<span class="mark-ref" aria-hidden="true"> (mark 2)</span>.
+                Location Finding; sPCE (↑), a lower bound on the total expected information gain,
+                mean ± 95% CI over 2,000 rollouts.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Abstract (verbatim from the paper)
+           ============================================================ -->
+      <section id="abstract" class="section section--tint" aria-labelledby="abstract-title">
+        <div class="container prose">
+          <h2 id="abstract-title">Abstract</h2>
+          <p>
+            Amortized Bayesian experimental design (BED) enables real-time design strategies by
+            shifting acquisition cost offline, but existing methods remain tied to the prior and
+            task distribution they were trained on and cannot exploit additional information
+            available at deployment. We introduce in-context amortized BED with unified knowledge
+            encoding (IMBUE), a BED framework that admits external knowledge at deployment through a
+            unified in-context interface. IMBUE accepts two forms of such knowledge without
+            retraining, namely user-specified prior knowledge and observations from previous
+            instances of the experiment. Both are encoded as additional input tokens and processed
+            in-context with the accumulated observations by a shared Transformer, and a learned
+            reliability filter scores each external token against the observations and excludes
+            inconsistent ones. Across four benchmarks, IMBUE accelerates early-stage information
+            acquisition when the external knowledge is reliable, and remains close to the
+            no-external baseline when it is not.
+          </p>
+        </div>
+      </section>
+
+      <!-- TODO: 暂无视频。有视频后，把文件放进 static/videos/，在这里取消注释下面的区块，
+           并把上面按钮栏里的 Video 按钮一起加上：
+
+      <section id="video" class="section" aria-labelledby="video-title">
+        <div class="container prose">
+          <h2 id="video-title">Video</h2>
+          <video class="video" muted autoplay loop playsinline preload="metadata"
+                 poster="static/images/VIDEO_POSTER.png">
+            <source src="static/videos/VIDEO_FILE.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </section>
+      -->
+
+      <!-- ============================================================
+           Method
+           ============================================================ -->
+      <section id="method" class="section" aria-labelledby="method-title">
+        <div class="container">
+          <h2 id="method-title">Method</h2>
+
+          <div class="prose">
+            <p>
+              Bayesian experimental design (BED) chooses each experiment to maximize the expected
+              information gain (EIG) about the parameters of interest. Amortized BED trains a design
+              policy offline, so at deployment it maps the observations gathered so far to the next
+              design in a single forward pass. Existing policies, however, are trained under a fixed
+              prior and have no input pathway for what an experimenter often knows about the
+              specific instance: a <em>user-specified prior</em> over the parameters, or
+              <em>observations from previous instances</em> of the same experiment. Such knowledge
+              can also be unreliable, and conditioning on it without scrutiny can leave the policy
+              worse off than a no-external baseline, a phenomenon known as negative transfer.
+            </p>
+          </div>
+
+          <figure class="figure figure--spaced">
+            <a class="figure__frame zoom" href="static/images/architecture.png" title="Enlarge figure">
+              <picture>
+                <source media="(max-width: 600px)" srcset="static/images/architecture-mobile.png" width="1080" height="1867" />
+                <img
+                  src="static/images/architecture.png"
+                  width="2160"
+                  height="930"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Architecture diagram in two parts. The network: auxiliary data and prior histograms, together with the context set, query set and target set, pass through embedding layers; the auxiliary and prior tokens then go through a reliability encoder and a per-token gate before joining the Transformer layers, which feed the output heads. Reliability filtering, in a dashed box: an in-context token and the context tokens enter a cross-attention block, an MLP scores the result, and a step function turns the score into a keep-or-discard decision."
+                />
+              </picture>
+            </a>
+            <figcaption>
+              <b>Architecture of IMBUE.</b> Auxiliary previous-instance data and the user-prior
+              histogram are encoded as in-context tokens and screened by the reliability filter
+              (dashed box). Retained tokens are then combined with context, query, and target tokens
+              in the shared Transformer layers.
+            </figcaption>
+          </figure>
+
+          <div class="cards">
+            <article class="card card--prior">
+              <h3>Prior tokens</h3>
+              <p>
+                A belief about each parameter <var>θ</var><sub><var>l</var></sub> is discretized into
+                a normalized histogram over <var>N</var><sub>B</sub> bins, which accepts multimodal,
+                skewed or truncated beliefs without committing to a parametric family. An MLP maps the
+                histogram to a token, and a learnable parameter-specific embedding, shared with that
+                parameter's target token, ties the two together. Parameters without a user-specified
+                prior get a uniform histogram.
+              </p>
+            </article>
+            <article class="card card--instance">
+              <h3>Instance tokens</h3>
+              <p>
+                Each previous instance, a sequence of <var>T</var> design–outcome pairs, is compressed
+                into a single token by a per-instance Transformer encoder shared across all
+                <var>K</var> instances. The main encoder therefore receives <var>K</var> instance
+                tokens instead of <span class="math"><var>K</var>·<var>T</var></span> raw observations, which would scale
+                self-attention quadratically in <span class="math"><var>K</var>·<var>T</var></span>.
+              </p>
+            </article>
+            <article class="card card--filter">
+              <h3>Reliability filter</h3>
+              <p>
+                A cross-attention block scores each in-context token against the embeddings of the
+                experimental history, giving a score <span class="math"><var>α</var>&nbsp;∈&nbsp;[0, 1]</span>. Tokens with
+                <span class="math"><var>α</var>&nbsp;≤&nbsp;<var>τ</var>&nbsp;=&nbsp;0.5</span> are excluded from self-attention through a
+                key-padding mask. The scores are recomputed every round as observations accumulate;
+                before the first observation arrives, all in-context tokens are excluded.
+              </p>
+            </article>
+          </div>
+
+          <details class="more">
+            <summary>Training and loss</summary>
+            <div class="more__body">
+              <p class="prose">
+                Training rollouts are simulated, so the ground-truth parameters are known during
+                training and give oracle reliability labels for the filter; the labels are neither
+                observed nor required at deployment. Previous instances are drawn from a 70/30
+                relevant/irrelevant mixture, and priors from an analogous mixture of calibrated,
+                miscalibrated and uniform regimes, so that a single trained policy can absorb
+                whatever information is supplied at deployment.
+              </p>
+              <p class="prose">
+                IMBUE adopts the shared Transformer backbone, head structure, per-step reward and
+                variational training scheme of ALINE unchanged. A design head produces the policy, an
+                inference head produces a Gaussian-mixture posterior, and both are trained jointly
+                with the filter through
+                <span class="math"><var>L</var>&nbsp;=&nbsp;<var>λ</var><sub>1</sub><var>L</var><sub>policy</sub> + <var>λ</var><sub>2</sub><var>L</var><sub>inf</sub> + <var>λ</var><sub>3</sub><var>L</var><sub>filter</sub></span>,
+                with <span class="math"><var>λ</var><sub>1</sub>&nbsp;=&nbsp;<var>λ</var><sub>2</sub>&nbsp;=&nbsp;<var>λ</var><sub>3</sub>&nbsp;=&nbsp;1</span> and an undiscounted reward,
+                <span class="math"><var>γ</var>&nbsp;=&nbsp;1</span>. If every in-context token is excluded, the
+                forward pass reduces to a history-only amortized BED policy.
+              </p>
+            </div>
+          </details>
+
+          <details class="more">
+            <summary>Attention masks</summary>
+            <div class="more__body">
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/attention_masks.png" title="Enlarge figure">
+                  <img
+                    src="static/images/attention_masks.png"
+                    width="2160"
+                    height="1008"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Two attention-mask grids, the left with instance tokens and the right with prior tokens. Rows and columns list the in-context tokens, the context pairs (x1, y1) to (xt, yt), the query designs and the target slots. Shaded squares mark allowed attention: every token attends to the in-context and context tokens, and the query tokens also attend to the target slots."
+                  />
+                </a>
+                <figcaption>
+                  Attention masks of IMBUE's shared Transformer layers for the previous-instance
+                  channel (left, in-context tokens <var>r</var><sub>1</sub>, …, <var>r</var><sub><var>K</var></sub>)
+                  and the prior channel (right, in-context tokens
+                  <var>e</var><sub>1</sub><sup>prior</sup>, …, <var>e</var><sub><var>L</var></sub><sup>prior</sup>).
+                  Rows index queries and columns index keys, ordered as in-context tokens, context
+                  tokens <span class="math">(<var>x</var><sub><var>i</var></sub>, <var>y</var><sub><var>i</var></sub>)</span>, query tokens
+                  <var>x</var><sub><var>m</var></sub><sup>q</sup> and target tokens <var>ζ</var><sub><var>l</var></sub>.
+                  Shaded squares indicate allowed attention.
+                </figcaption>
+              </figure>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Results: the paper's main-text experiments (Sections 4.1–4.6)
+           ============================================================ -->
+      <section id="results" class="section section--tint" aria-labelledby="results-title">
+        <div class="container">
+          <h2 id="results-title">Results</h2>
+
+          <div class="prose">
+            <p>
+              IMBUE is evaluated on four BED benchmarks: Location Finding, CES, GP active learning
+              and a psychometric task. Baselines without a native pathway for in-context knowledge
+              receive it through naive concatenation to the experimental history, marked with
+              <sup>*</sup>.
+            </p>
+          </div>
+
+          <!-- The detailed setup is folded away; the captions below repeat what
+               each plot needs (metric, rollouts, interval). -->
+          <details class="more more--setup" id="setup">
+            <summary>Setup: the four benchmarks, metrics and notation</summary>
+            <div class="more__body">
+              <figure class="table-figure table-figure--narrow">
+                <figcaption id="benchmarks-caption">
+                  <b>The four benchmarks.</b> ↑ higher is better, ↓ lower is better.
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="benchmarks-caption" tabindex="0">
+                  <table class="results results--text">
+                    <thead>
+                      <tr>
+                        <th scope="col">Benchmark</th>
+                        <th scope="col">In-context knowledge</th>
+                        <th scope="col">Inference target</th>
+                        <th scope="col">Steps <var>T</var></th>
+                        <th scope="col">Metric</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Location Finding</th>
+                        <td>Prior over each source coordinate</td>
+                        <td>Locations of two hidden sources in <span class="math">[0, 1]<sup>2</sup></span></td>
+                        <td>20</td>
+                        <td>sPCE ↑</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">CES</th>
+                        <td><var>K</var> previous respondents</td>
+                        <td>Preference parameter <span class="math"><var>θ</var>&nbsp;∈&nbsp;ℝ<sup>5</sup></span></td>
+                        <td>10</td>
+                        <td>sPCE ↑</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">GP active learning (1D)</th>
+                        <td><var>K</var>&nbsp;=&nbsp;5 previous instances, 0–5 of them irrelevant</td>
+                        <td>Predictions at held-out test inputs</td>
+                        <td>15</td>
+                        <td>RMSE ↓</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Psychometric</th>
+                        <td><var>K</var>&nbsp;=&nbsp;5 previous participants</td>
+                        <td>The four parameters of a psychometric function, <span class="math"><var>θ</var>&nbsp;∈&nbsp;ℝ<sup>4</sup></span></td>
+                        <td>30</td>
+                        <td>Joint RMSE (threshold, slope) ↓</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+
+              <dl class="glossary" aria-label="How to read the results">
+                <dt>sPCE</dt>
+                <dd>Sequential Prior Contrastive Estimation, a lower bound on the total EIG.</dd>
+                <dt>Relevant / irrelevant</dt>
+                <dd>
+                  A relevant previous instance comes from parameters that are a small Gaussian
+                  perturbation of the current ones; an irrelevant one is drawn independently of them. On
+                  GP active learning: perturbations of the target function versus unrelated functions.
+                </dd>
+                <dt>Strong / miscalibrated prior</dt>
+                <dd>Concentrated near the true parameters, or shifted away from them.</dd>
+                <dt>Method<sup>*</sup></dt>
+                <dd>In-context knowledge supplied by naive concatenation to the experimental history.</dd>
+                <dt>± and bands</dt>
+                <dd>95% confidence intervals, unless a caption says otherwise.</dd>
+              </dl>
+            </div>
+          </details>
+
+          <!-- 4.1 -->
+          <article class="finding finding--split" aria-labelledby="f-naive">
+            <div class="finding__text">
+              <h3 id="f-naive">Naive concatenation fails</h3>
+              <p>
+                Can an existing amortized policy use in-context knowledge supplied at deployment or
+                at training time? On CES with <var>K</var>&nbsp;=&nbsp;5 previous instances, ALINE<sup>*</sup>,
+                which concatenates the instances only at deployment, falls below the original ALINE
+                in both regimes: previous instances unseen during training disrupt the policy
+                regardless of their reliability. ALINE-aux, retrained on the same 70/30 mixture as
+                IMBUE, roughly matches ALINE under relevant input and trails it under irrelevant
+                input, so retraining alone extracts little from reliable instances and only partly
+                suppresses misleading information.
+              </p>
+              <p>
+                IMBUE exceeds ALINE under relevant input and stays close to it under irrelevant
+                input.
+              </p>
+            </div>
+            <figure class="figure finding__figure">
+              <a class="figure__frame zoom" href="static/images/ces/ces_naive_concatenation_k5.png" title="Enlarge figure">
+                <picture>
+                  <source media="(max-width: 600px)" srcset="static/images/ces/ces_naive_concatenation_k5-mobile.png" width="1080" height="2068" />
+                  <img
+                    src="static/images/ces/ces_naive_concatenation_k5.png"
+                    width="1400"
+                    height="730"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Two line charts of sPCE over experiment steps 1 to 10 on CES with five previous instances. Relevant instances: IMBUE ends highest, ALINE-aux and ALINE slightly lower, ALINE-star lowest. Irrelevant instances: ALINE and IMBUE end close together at the top, ALINE-aux lower, and ALINE-star clearly lowest."
+                  />
+                </picture>
+              </a>
+              <figcaption>
+                <b>Concatenating previous instances at deployment hurts an existing policy.</b>
+                ALINE<sup>*</sup> falls below ALINE whether the instances are relevant or not; IMBUE
+                exceeds ALINE with relevant instances and stays close to it with irrelevant ones. CES
+                with <var>K</var>&nbsp;=&nbsp;5 previous instances; sPCE (↑, a lower bound on the total
+                expected information gain), mean ± 95% CI over <var>T</var>&nbsp;=&nbsp;10 steps across
+                2,000 rollouts.
+              </figcaption>
+            </figure>
+          </article>
+
+          <!-- 4.2 -->
+          <article class="finding finding--split finding--flip" aria-labelledby="f-accel">
+            <div class="finding__text">
+              <h3 id="f-accel">Reliable in-context knowledge accelerates acquisition</h3>
+              <p>
+                On Location Finding, IMBUE receives one prior histogram per source coordinate. Under
+                a strong prior, IMBUE is consistently higher than ALINE through the early and middle
+                rollout, and reaches ALINE's final sPCE several steps earlier. The advantage narrows
+                toward the end as the contribution of the prior diminishes relative to the accumulated
+                observations. Under a miscalibrated prior, IMBUE stays close to the ALINE baseline
+                through the rollout and finishes well above DAD, RL-BOED and the random reference.
+              </p>
+              <p>
+                The same acceleration holds on the previous-instance channel: on CES, <var>K</var>
+                relevant previous instances raise IMBUE's sPCE above the <var>K</var>&nbsp;=&nbsp;0 baseline,
+                and the gain increases with <var>K</var> (table below).
+              </p>
+            </div>
+            <figure class="figure finding__figure finding__figure--narrow">
+              <a class="figure__frame zoom" href="static/images/location/location_spce_baselines.png" title="Enlarge figure">
+                <img
+                  src="static/images/location/location_spce_baselines.png"
+                  width="1200"
+                  height="1132"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Line chart of sPCE over 20 steps on Location Finding. IMBUE with strong priors rises fastest and stays on top; ALINE and IMBUE with miscalibrated priors follow close together; RL-BOED, DAD and Random end progressively lower."
+                />
+              </a>
+              <figcaption>
+                <b>A strong prior lets IMBUE reach ALINE's final sPCE several steps earlier.</b>
+                With a miscalibrated prior it stays close to ALINE. Location Finding; sPCE (↑) over
+                <var>T</var>&nbsp;=&nbsp;20 steps, mean ± 95% CI across 2,000 rollouts.
+              </figcaption>
+            </figure>
+          </article>
+
+          <!-- 4.3 -->
+          <article class="finding" aria-labelledby="f-robust">
+            <div class="finding__text prose">
+              <h3 id="f-robust">IMBUE remains robust to unreliable in-context knowledge</h3>
+              <p>
+                On CES, IMBUE's sPCE increases with <var>K</var> when the previous instances are
+                relevant. When they are irrelevant, IMBUE stays close to its <var>K</var>&nbsp;=&nbsp;0 score
+                at both values of <var>K</var>, while ALINE<sup>*</sup> degrades as <var>K</var> grows.
+                DAD<sup>*</sup> and RL-BOED<sup>*</sup> drop under any added input regardless of its
+                reliability. The same robustness appears on the prior channel under a miscalibrated
+                prior (Location Finding, above).
+              </p>
+            </div>
+            <figure class="table-figure">
+              <figcaption id="table-ces">
+                <b>CES: relevant instances lift IMBUE above its <var>K</var>&nbsp;=&nbsp;0 score, and
+                irrelevant ones leave it close to that score.</b> ALINE<sup>*</sup> degrades as
+                <var>K</var> grows, and DAD<sup>*</sup> and RL-BOED<sup>*</sup> drop under any added
+                input. sPCE (mean ± 95% CI, 2,000 rollouts) under <var>K</var> previous instances. At
+                <var>K</var>&nbsp;=&nbsp;0 nothing is concatenated, so the <var>K</var>&nbsp;=&nbsp;0 entries of the
+                starred methods are the standard DAD, RL-BOED, and ALINE without any in-context
+                knowledge. Bold marks the best entry in each column, as in the paper.
+              </figcaption>
+              <div class="table-wrap" role="region" aria-labelledby="table-ces" tabindex="0">
+                <table class="results">
+                  <thead>
+                    <tr>
+                      <td></td>
+                      <th scope="col"><var>K</var>&nbsp;=&nbsp;0</th>
+                      <th scope="colgroup" colspan="2"><var>K</var>&nbsp;=&nbsp;1</th>
+                      <th scope="colgroup" colspan="2"><var>K</var>&nbsp;=&nbsp;5</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Method</th>
+                      <th scope="col"><span aria-hidden="true">—</span><span class="visually-hidden">no previous instances</span></th>
+                      <th scope="col">Relevant</th>
+                      <th scope="col">Irrelevant</th>
+                      <th scope="col">Relevant</th>
+                      <th scope="col">Irrelevant</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Random</th>
+                      <td>9.05 <span class="ci">± 0.26</span></td>
+                      <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                      <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                      <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                      <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">DAD<sup>*</sup></th>
+                      <td>11.52 <span class="ci">± 0.17</span></td>
+                      <td>7.38 <span class="ci">± 0.21</span></td>
+                      <td>7.37 <span class="ci">± 0.21</span></td>
+                      <td>5.16 <span class="ci">± 0.21</span></td>
+                      <td>5.40 <span class="ci">± 0.21</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">RL-BOED<sup>*</sup></th>
+                      <td><strong>14.34 <span class="ci">± 0.13</span></strong></td>
+                      <td>4.54 <span class="ci">± 0.20</span></td>
+                      <td>4.74 <span class="ci">± 0.21</span></td>
+                      <td>2.56 <span class="ci">± 0.15</span></td>
+                      <td>2.84 <span class="ci">± 0.17</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">ALINE<sup>*</sup></th>
+                      <td>13.37 <span class="ci">± 0.15</span></td>
+                      <td>13.27 <span class="ci">± 0.15</span></td>
+                      <td>11.10 <span class="ci">± 0.22</span></td>
+                      <td>13.07 <span class="ci">± 0.15</span></td>
+                      <td>10.16 <span class="ci">± 0.24</span></td>
+                    </tr>
+                  </tbody>
+                  <tbody>
+                    <tr class="ours">
+                      <th scope="row">IMBUE <span class="tag">ours</span></th>
+                      <td>13.46 <span class="ci">± 0.15</span></td>
+                      <td><strong>13.63 <span class="ci">± 0.14</span></strong></td>
+                      <td><strong>13.42 <span class="ci">± 0.15</span></strong></td>
+                      <td><strong>13.93 <span class="ci">± 0.12</span></strong></td>
+                      <td><strong>13.14 <span class="ci">± 0.16</span></strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+            <p class="finding__note prose">
+              Without retraining, IMBUE also does not degrade sharply under three deployment shifts
+              absent from training: biased but partially relevant previous instances, a different
+              noise model in the previous instances, and priors whose support excludes the true
+              parameters (<a href="#more-shifts">More results → Deployment shifts</a>).
+            </p>
+          </article>
+
+          <!-- 4.5 -->
+          <article class="finding" aria-labelledby="f-mixed">
+            <div class="finding__text prose">
+              <h3 id="f-mixed">IMBUE handles mixed-relevance inputs per instance</h3>
+              <p>
+                So far the previous instances were either all relevant or all irrelevant. Here the
+                <var>K</var>&nbsp;=&nbsp;5 instances mix the two, testing whether IMBUE can retain relevant
+                instance tokens and exclude irrelevant ones within a single forward pass. On 1D GP
+                active learning, the policy chooses <span class="math"><var>x</var><sub><var>t</var></sub>&nbsp;∈&nbsp;[−5, 5]</span>,
+                observes a noisy evaluation of an unknown target function and is scored by the RMSE of
+                its predictions on a held-out test set. Synthetic is a fresh draw from the GP
+                prior used in training; Forrester, Higdon and Gramacy &amp; Lee are analytic functions
+                that probe out-of-distribution generalization. Relevant instances are per-instance
+                perturbations of the target function, irrelevant ones unrelated 1D functions.
+              </p>
+              <p>
+                GP<sup>*</sup>, ALINE<sup>*</sup> and MT-GP degrade as the number of irrelevant
+                instances grows, whereas IMBUE remains essentially flat on all four benchmarks.
+                ALINE<sup>*</sup> shares IMBUE's backbone but concatenates the instances at
+                deployment, so the backbone architecture alone does not provide this robustness.
+                MT-GP, a multi-task GP that treats each previous instance as a separate task, fuses
+                all <var>K</var> instances into a joint model with learned task-correlation weights;
+                IMBUE instead makes a binary keep-or-discard decision per token, excluding tokens
+                judged unreliable from self-attention.
+              </p>
+            </div>
+            <figure class="figure">
+              <a class="figure__frame zoom" href="static/images/gp/gp_mixed_relevance.png" title="Enlarge figure">
+                <picture>
+                  <source media="(max-width: 600px)" srcset="static/images/gp/gp_mixed_relevance-mobile.png" width="1080" height="3742" />
+                  <img
+                    src="static/images/gp/gp_mixed_relevance.png"
+                    width="2160"
+                    height="615"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Four line charts, one per benchmark (Synthetic, Forrester, Higdon, Gramacy and Lee), of final RMSE against the number of irrelevant instances from 0 to 5. GP-star and ALINE-star rise steadily as more instances are irrelevant, MT-GP rises more slowly, and IMBUE stays low and nearly flat."
+                  />
+                </picture>
+              </a>
+              <figcaption>
+                <b>As more of the five previous instances are irrelevant, IMBUE's error stays
+                essentially flat.</b> GP<sup>*</sup>, ALINE<sup>*</sup> and MT-GP degrade. Mixed
+                previous-instance input on four 1D GP active learning benchmarks; final RMSE
+                (↓), mean ± 95% CI over 100 rollouts. With <var>K</var>&nbsp;=&nbsp;5 instances, the
+                <var>x</var>-axis varies the number that are irrelevant from 0 to 5.
+              </figcaption>
+            </figure>
+          </article>
+
+          <!-- 4.6 -->
+          <article class="finding finding--split" aria-labelledby="f-psy">
+            <div class="finding__text">
+              <h3 id="f-psy">Realistic psychometric task</h3>
+              <p>
+                The task infers the four parameters of a psychometric model from binary yes/no
+                responses to stimulus intensities over <var>T</var>&nbsp;=&nbsp;30 steps, scored on the
+                threshold and slope, with <var>K</var>&nbsp;=&nbsp;5 instances from previous participants.
+                ALINE and the classical QUEST+ and Psi-marginal serve as no-external references, and
+                without previous instances (<var>K</var>&nbsp;=&nbsp;0) IMBUE is comparable to all three.
+                With relevant previous instances, it attains lower joint RMSE than all of them
+                throughout the rollout; its RMSE drops sharply in the first few steps, and the gap
+                narrows toward the end. Its gains with relevant instances are larger at higher
+                <var>K</var>.
+              </p>
+              <p>
+                With irrelevant previous instances, IMBUE tracks the no-external baselines closely,
+                and its joint RMSE stays below that of IMBUE w/o filter, by a margin that grows and
+                persists longer as <var>K</var> increases. ALINE<sup>*</sup>, by contrast, does not
+                improve over its <var>K</var>&nbsp;=&nbsp;0 RMSE even with relevant instances, and its RMSE
+                grows with <var>K</var> under irrelevant ones (<a href="#more-psy">More results →
+                Psychometric</a>).
+              </p>
+            </div>
+            <figure class="figure finding__figure finding__figure--narrow">
+              <a class="figure__frame zoom" href="static/images/psy/psy_rmse_baselines.png" title="Enlarge figure">
+                <img
+                  src="static/images/psy/psy_rmse_baselines.png"
+                  width="1200"
+                  height="1126"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Line chart of joint RMSE over 30 steps on the psychometric task. IMBUE with five relevant instances drops sharply in the first steps and stays lowest; IMBUE with five irrelevant instances tracks QUEST+, Psi-marginal and ALINE closely."
+                />
+              </a>
+              <figcaption>
+                <b>Relevant previous participants cut IMBUE's error sharply early in the rollout.</b>
+                With irrelevant ones, IMBUE tracks the no-external baselines. Psychometric task; joint
+                RMSE on <span class="math">(<var>θ</var><sub>threshold</sub>, <var>θ</var><sub>slope</sub>)</span> (↓) over <var>T</var>&nbsp;=&nbsp;30 steps, mean ± 95% CI
+                across 500 rollouts.
+              </figcaption>
+            </figure>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Ablations: Section 4.4 and Appendix E.1, E.5, E.6
+           ============================================================ -->
+      <section id="ablations" class="section" aria-labelledby="ablations-title">
+        <div class="container">
+          <h2 id="ablations-title">Ablations</h2>
+
+          <article class="finding finding--first" aria-labelledby="a-staged">
+            <div class="finding__text prose">
+              <h3 id="a-staged">Contributions of training, tokenization, and filtering</h3>
+              <p>
+                A staged ablation on CES with <var>K</var>&nbsp;=&nbsp;5 starts from ALINE<sup>*</sup> and
+                successively adds mixed-regime training (ALINE-aux), the instance-token interface
+                (IMBUE w/o filter, retrained without the filter and keeping all instance tokens) and
+                reliability filtering (IMBUE). Mixed-regime training and the instance-token interface
+                improve mean sPCE over ALINE<sup>*</sup> under both reliable and unreliable inputs.
+                Adding the filter further increases mean sPCE under biased and irrelevant inputs,
+                while performance under relevant inputs remains similar. This is consistent with the
+                filter's purpose: limiting negative transfer from unreliable instances and simply
+                retaining reliable ones, for which no additional gain is expected. Under irrelevant
+                inputs, the benefit of filtering is largest in the middle of CES rollouts, grows with
+                <var>K</var>, and is more persistent on the psychometric task.
+              </p>
+              <p>
+                Retrieve-then-condition passes ALINE-aux only the two instances that best explain the
+                observations collected so far; compared with ALINE-aux, it improves sPCE under
+                irrelevant inputs but reduces it under relevant inputs, since its fixed top-two
+                selection must discard useful instances. IMBUE's keep-or-discard decision has no such
+                budget and can keep all five instances or drop all five at any round, depending on the
+                observations accumulated so far. On the prior channel (Location Finding), however, the
+                filter has little effect on sPCE across all four tested prior conditions, and IMBUE
+                w/o filter retains the robustness to miscalibrated priors. Together with the CES and
+                psychometric filter ablations, this indicates that filtering provides additional
+                protection primarily against unreliable previous-instance input.
+              </p>
+            </div>
+            <details class="more">
+              <summary><span>Staged ablation table (CES, <var>K</var>&nbsp;=&nbsp;5)</span></summary>
+              <div class="more__body">
+                <figure class="table-figure">
+                  <figcaption id="table-ablation">
+                    <b>Staged ablation on CES with <var>K</var>&nbsp;=&nbsp;5 previous instances.</b> sPCE (mean ±
+                    95% CI, 2,000 rollouts). Biased instances are a deployment shift absent from training.
+                    Bold marks the best entry in each column, as in the paper.
+                  </figcaption>
+                  <div class="table-wrap" role="region" aria-labelledby="table-ablation" tabindex="0">
+                    <table class="results">
+                      <thead>
+                        <tr>
+                          <td></td>
+                          <th scope="col"><var>K</var>&nbsp;=&nbsp;0</th>
+                          <th scope="colgroup" colspan="3"><var>K</var>&nbsp;=&nbsp;5</th>
+                        </tr>
+                        <tr>
+                          <th scope="col">Method</th>
+                          <th scope="col"><span aria-hidden="true">—</span><span class="visually-hidden">no previous instances</span></th>
+                          <th scope="col">Relevant</th>
+                          <th scope="col">Biased</th>
+                          <th scope="col">Irrelevant</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">ALINE<sup>*</sup></th>
+                          <td>13.37 <span class="ci">± 0.15</span></td>
+                          <td>13.07 <span class="ci">± 0.15</span></td>
+                          <td>11.26 <span class="ci">± 0.21</span></td>
+                          <td>10.16 <span class="ci">± 0.24</span></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">ALINE-aux</th>
+                          <td>13.19 <span class="ci">± 0.15</span></td>
+                          <td>13.52 <span class="ci">± 0.13</span></td>
+                          <td>12.72 <span class="ci">± 0.16</span></td>
+                          <td>12.23 <span class="ci">± 0.18</span></td>
+                        </tr>
+                        <tr class="ours ours--variant">
+                          <th scope="row">IMBUE w/o filter</th>
+                          <td>13.39 <span class="ci">± 0.15</span></td>
+                          <td><strong>13.99 <span class="ci">± 0.12</span></strong></td>
+                          <td>13.10 <span class="ci">± 0.15</span></td>
+                          <td>12.97 <span class="ci">± 0.16</span></td>
+                        </tr>
+                        <tr class="ours">
+                          <th scope="row">IMBUE <span class="tag">ours</span></th>
+                          <td><strong>13.46 <span class="ci">± 0.15</span></strong></td>
+                          <td>13.93 <span class="ci">± 0.12</span></td>
+                          <td><strong>13.23 <span class="ci">± 0.15</span></strong></td>
+                          <td><strong>13.14 <span class="ci">± 0.16</span></strong></td>
+                        </tr>
+                      </tbody>
+                      <tbody>
+                        <tr>
+                          <th scope="row">Retrieve-then-condition</th>
+                          <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                          <td>13.29 <span class="ci">± 0.14</span></td>
+                          <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                          <td>12.69 <span class="ci">± 0.17</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </figure>
+              </div>
+            </details>
+          </article>
+
+          <article class="finding" aria-labelledby="a-filter">
+            <div class="finding__text prose">
+              <h3 id="a-filter">With and without the filter</h3>
+              <p>
+                With irrelevant previous instances on CES, the full IMBUE achieves higher sPCE than
+                IMBUE w/o filter, with a clearer advantage when more irrelevant instances are
+                supplied. The gap is most visible during the middle of the rollout and narrows as
+                experimental observations accumulate. On the psychometric task the full IMBUE
+                likewise keeps a lower joint RMSE, with a larger and more persistent gap when more
+                irrelevant instances are supplied. With relevant instances, the two variants are
+                indistinguishable on both tasks: when all instance tokens carry useful signal,
+                removing the filter neither helps nor hurts.
+              </p>
+            </div>
+            <figure class="figure">
+              <a class="figure__frame zoom" href="static/images/ces/ces_filter_ablation.png" title="Enlarge figure">
+                <img
+                  src="static/images/ces/ces_filter_ablation.png"
+                  width="2160"
+                  height="927"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Twelve small line charts of sPCE over 10 steps on CES. Top row: relevant instances with K from 0 to 5, where the curves with and without the filter overlap. Bottom row: irrelevant instances with K from 0 to 5, where the curve with the filter lies above the one without, more visibly for larger K."
+                />
+              </a>
+              <figcaption>
+                <b>With irrelevant instances, the full IMBUE stays above the variant without the
+                filter, more clearly for larger <var>K</var>; with relevant instances the two are
+                indistinguishable.</b> Filter ablation on CES under <span class="math"><var>K</var>&nbsp;∈&nbsp;{0, 1, …, 5}</span>
+                previous instances in both reliability regimes (top row: relevant, bottom row:
+                irrelevant). sPCE, mean ± 95% CI over 2,000 rollouts, for the full IMBUE (w/ filter)
+                and the variant retrained without the reliability filter (w/o filter).
+              </figcaption>
+            </figure>
+          </article>
+
+          <article class="finding finding--split" aria-labelledby="a-scores">
+            <div class="finding__text">
+              <h3 id="a-scores">What the filter learns</h3>
+              <p>
+                On Location Finding, the filter's scores for prior tokens settle close to 1 under a
+                strong prior and stabilize around 0.8 under a weak prior. Under a miscalibrated prior
+                they start at an intermediate level and decay toward 0 as observations accumulate,
+                indicating decreasing trust in the provided prior; under a uniform prior they stay
+                near 0 from the first rounds.
+              </p>
+              <p>
+                On CES, biased instances, a regime never seen in training, receive mean scores
+                between those of relevant and irrelevant instances: the filter places the unseen
+                regime between the two it was trained on rather than forcing it into either.
+              </p>
+            </div>
+            <div class="finding__figure">
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/location/location_filter_alpha.png" title="Enlarge figure">
+                  <img
+                    src="static/images/location/location_filter_alpha.png"
+                    width="1400"
+                    height="973"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Line chart of the filter score alpha for prior tokens over 20 steps on Location Finding. Strong-prior scores settle close to 1, weak-prior scores around 0.8, miscalibrated-prior scores decay from an intermediate level toward 0, and uniform-prior scores stay near 0; a dotted line marks the threshold 0.5."
+                  />
+                </a>
+                <figcaption>
+                  <b>Trust follows the quality of the prior:</b> scores settle near 1 for a strong
+                  prior and decay toward 0 for a miscalibrated one. Filter output
+                  <var>α</var><sub><var>j</var></sub> for the prior tokens on Location Finding, mean ±
+                  95% CI over 100 rollouts, against experiment step <var>t</var>. The dotted line marks
+                  <var>τ</var>&nbsp;=&nbsp;0.5.
+                </figcaption>
+              </figure>
+              <figure class="table-figure table-figure--compact">
+                <figcaption id="table-alpha">
+                  <b>Biased instances, unseen in training, score between relevant and irrelevant
+                  ones.</b> Mean score <var>α</var> over instance tokens on CES with
+                  <var>K</var>&nbsp;=&nbsp;5 (mean ± 95% CI, 2,000 rollouts).
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="table-alpha" tabindex="0">
+                  <table class="results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Step <var>t</var></th>
+                        <th scope="col">Relevant</th>
+                        <th scope="col">Biased (shift)</th>
+                        <th scope="col">Irrelevant</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">2</th>
+                        <td>0.818 <span class="ci">± 0.004</span></td>
+                        <td>0.677 <span class="ci">± 0.012</span></td>
+                        <td>0.479 <span class="ci">± 0.010</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">10</th>
+                        <td>0.906 <span class="ci">± 0.002</span></td>
+                        <td>0.621 <span class="ci">± 0.016</span></td>
+                        <td>0.246 <span class="ci">± 0.008</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+            </div>
+          </article>
+
+          <details class="more">
+            <summary>Binary versus soft gating</summary>
+            <div class="more__body">
+              <p class="prose">
+                Soft gating scales each token's contribution to self-attention by its score
+                <var>α</var> instead of keeping or excluding it at <var>τ</var>&nbsp;=&nbsp;0.5. The two
+                variants achieve similar sPCE with relevant and irrelevant previous instances,
+                indicating no clear improvement from soft gating in these experiments.
+              </p>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/ces/ces_binary_vs_soft_gating.png" title="Enlarge figure">
+                  <img
+                    src="static/images/ces/ces_binary_vs_soft_gating.png"
+                    width="2160"
+                    height="516"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Five line charts of sPCE over 10 steps on CES (K = 0; relevant K = 1 and 5; irrelevant K = 1 and 5) comparing binary and soft gating; the two curves nearly overlap in every panel."
+                  />
+                </a>
+                <figcaption>
+                  Binary versus soft gating on CES. sPCE (mean ± 95% CI over 2,000 rollouts,
+                  <var>T</var>&nbsp;=&nbsp;10 steps) under the five previous-instance configurations of the CES
+                  table above.
+                </figcaption>
+              </figure>
+            </div>
+          </details>
+
+          <details class="more">
+            <summary>Sensitivity to training mixture and filter loss weight</summary>
+            <div class="more__body">
+              <p class="prose">
+                Increasing <var>p</var><sub>good</sub>, the probability that a prior marginal is
+                calibrated during training, improves sPCE under strong priors but reduces it under
+                miscalibrated priors, while weak and uniform priors are much less affected: the
+                training mixture controls a trade-off between benefiting from informative priors and
+                robustness to misleading ones, and the default <var>p</var><sub>good</sub>&nbsp;=&nbsp;0.7 is a
+                compromise within the tested range. The default <var>λ</var><sub>3</sub>&nbsp;=&nbsp;1 and the
+                smaller weight <var>λ</var><sub>3</sub>&nbsp;=&nbsp;0.1 give nearly identical final sPCE under
+                all four prior conditions, so the Location Finding results are insensitive to
+                <var>λ</var><sub>3</sub> within the tested range.
+              </p>
+              <figure class="figure figure--medium">
+                <a class="figure__frame zoom" href="static/images/location/location_sensitivity_pgood_lambda.png" title="Enlarge figure">
+                  <img
+                    src="static/images/location/location_sensitivity_pgood_lambda.png"
+                    width="1800"
+                    height="1006"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Eight line charts of sPCE over 20 steps on Location Finding under strong, weak, miscalibrated and uniform priors. Top row varies p-good over 0.5, 0.7 and 0.9: a higher value helps under the strong prior and hurts under the miscalibrated prior. Bottom row compares lambda-3 of 0.1 and 1: the curves nearly coincide."
+                  />
+                </a>
+                <figcaption>
+                  Sensitivity sweeps on Location Finding, sPCE (↑) over <var>T</var>&nbsp;=&nbsp;20 steps,
+                  mean ± 95% CI over 2,000 rollouts. Top: <span class="math"><var>p</var><sub>good</sub>&nbsp;∈&nbsp;{0.5, 0.7, 0.9}</span>,
+                  default 0.7. Bottom: filter loss weight <span class="math"><var>λ</var><sub>3</sub>&nbsp;∈&nbsp;{0.1, 1}</span>,
+                  default 1.
+                </figcaption>
+              </figure>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           More results: appendix figures, one tab per benchmark.
+           Without JavaScript the panels simply follow one another.
+           ============================================================ -->
+      <section id="more-results" class="section section--tint" aria-labelledby="more-title">
+        <div class="container">
+          <h2 id="more-title">More results</h2>
+          <p class="section-lede">From the paper's appendix, by benchmark.</p>
+
+          <div class="tabs" data-tabs>
+            <div class="tablist" role="tablist" aria-label="More results by benchmark" hidden>
+              <button type="button" class="tab" role="tab" id="tab-location" aria-controls="more-location">Location Finding</button>
+              <button type="button" class="tab" role="tab" id="tab-ces" aria-controls="more-ces">CES</button>
+              <button type="button" class="tab" role="tab" id="tab-gp" aria-controls="more-gp">GP active learning</button>
+              <button type="button" class="tab" role="tab" id="tab-psy" aria-controls="more-psy">Psychometric</button>
+              <button type="button" class="tab" role="tab" id="tab-shifts" aria-controls="more-shifts">Deployment shifts</button>
+              <button type="button" class="tab" role="tab" id="tab-compute" aria-controls="more-compute">Compute</button>
+            </div>
+
+            <!-- Location Finding (Appendix C.3, E.1, E.5) -->
+            <section class="tab-panel" id="more-location" aria-labelledby="more-location-title">
+              <h3 class="tab-panel__title" id="more-location-title">Location Finding</h3>
+              <div class="grid-2">
+                <figure class="figure">
+                  <a class="figure__frame zoom" href="static/images/location/location_design_trajectory.png" title="Enlarge figure">
+                    <img
+                      src="static/images/location/location_design_trajectory.png"
+                      width="1200"
+                      height="1122"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Scatter plot of the 20 designs chosen on Location Finding, colored by step, over the contours of the two supplied priors and the two true source locations (stars). Most queries fall in or near the prior regions; the final query is marked by a yellow square."
+                    />
+                  </a>
+                  <figcaption>
+                    Design trajectory: prior contours, true sources (stars), and queries colored by
+                    step; the yellow square marks the final query. Most queries lie in or near the
+                    regions highlighted by the supplied prior.
+                  </figcaption>
+                </figure>
+                <figure class="figure">
+                  <a class="figure__frame zoom" href="static/images/location/location_spce_prior_types.png" title="Enlarge figure">
+                    <img
+                      src="static/images/location/location_spce_prior_types.png"
+                      width="1200"
+                      height="915"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Line chart of sPCE over 20 steps on Location Finding. IMBUE with a strong prior is highest early on, followed by a weak prior; the uniform-prior curve overlaps ALINE, and the miscalibrated-prior curve runs slightly below them."
+                    />
+                  </a>
+                  <figcaption>
+                    sPCE under strong, weak, miscalibrated and uniform priors, and baseline ALINE (mean
+                    ± 95% CI over 2,000 rollouts). IMBUE accelerates early acquisition under a strong
+                    prior and, to a smaller extent, under a weak prior, and keeps close to ALINE under
+                    miscalibrated and uniform priors.
+                  </figcaption>
+                </figure>
+              </div>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/location/location_filter_ablation.png" title="Enlarge figure">
+                  <img
+                    src="static/images/location/location_filter_ablation.png"
+                    width="2160"
+                    height="630"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Four line charts of sPCE over 20 steps on Location Finding under strong, weak, miscalibrated and uniform priors; the curves with and without the filter overlap in every panel."
+                  />
+                </a>
+                <figcaption>
+                  Filter ablation under four prior conditions (sPCE mean ± 95% CI over 2,000
+                  rollouts). With and without the filter, the two variants are essentially
+                  indistinguishable, including under the miscalibrated prior.
+                </figcaption>
+              </figure>
+              <figure class="figure figure--medium">
+                <a class="figure__frame zoom" href="static/images/prior/prior_samples.png" title="Enlarge figure">
+                  <img
+                    src="static/images/prior/prior_samples.png"
+                    width="1400"
+                    height="1074"
+                    loading="lazy"
+                    decoding="async"
+                    alt="A five-by-five grid of example prior histograms on the support 0 to 2: Gaussian-shaped bumps of varying location and width, some cut off at the edge of the support, and two flat uniform histograms."
+                  />
+                </a>
+                <figcaption>
+                  Randomly sampled prior histograms used in training, shown on a generic support
+                  [0, 2]; the Location Finding experiments use the support [0, 1].
+                </figcaption>
+              </figure>
+            </section>
+
+            <!-- CES (Appendix E.2) -->
+            <section class="tab-panel" id="more-ces" aria-labelledby="more-ces-title">
+              <h3 class="tab-panel__title" id="more-ces-title">CES</h3>
+              <figure class="figure figure--medium">
+                <a class="figure__frame zoom" href="static/images/ces/ces_k_sweep.png" title="Enlarge figure">
+                  <img
+                    src="static/images/ces/ces_k_sweep.png"
+                    width="1800"
+                    height="732"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Two charts of sPCE against the number of previous instances K from 1 to 5, with error bars and a dotted K = 0 reference line. Relevant instances lie above the reference and level off from K = 2; irrelevant instances stay close to the reference, drifting slightly below it as K grows."
+                  />
+                </a>
+                <figcaption>
+                  Effect of the number of previous instances <var>K</var> (sPCE, mean ± 95% CI,
+                  2,000 rollouts). With relevant instances, sPCE improves initially and then levels
+                  off, suggesting diminishing returns from additional context; with irrelevant
+                  instances, it remains close to its <var>K</var>&nbsp;=&nbsp;0 value over the tested range.
+                </figcaption>
+              </figure>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/ces/ces_naive_concatenation_by_k.png" title="Enlarge figure">
+                  <img
+                    src="static/images/ces/ces_naive_concatenation_by_k.png"
+                    width="2160"
+                    height="521"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Five line charts of sPCE over 10 steps on CES for K = 0, relevant K = 1 and 5, and irrelevant K = 1 and 5, comparing IMBUE, ALINE-star and ALINE-aux. The three nearly coincide at K = 0; elsewhere IMBUE is highest, ALINE-aux in between and ALINE-star lowest, with the widest gaps for irrelevant instances."
+                  />
+                </a>
+                <figcaption>
+                  Stepwise sPCE (mean ± 95% CI, 2,000 rollouts) with <var>K</var>&nbsp;=&nbsp;0,
+                  <span class="math"><var>K</var>&nbsp;∈&nbsp;{1, 5}</span> relevant or <span class="math"><var>K</var>&nbsp;∈&nbsp;{1, 5}</span> irrelevant previous
+                  instances. ALINE-aux improves on ALINE<sup>*</sup>, especially under irrelevant
+                  input, but remains below IMBUE; at <var>K</var>&nbsp;=&nbsp;0 the three methods perform
+                  similarly.
+                </figcaption>
+              </figure>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/ces/ces_posterior.png" title="Enlarge figure">
+                  <img
+                    src="static/images/ces/ces_posterior.png"
+                    width="2160"
+                    height="709"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Three density plots of the marginal posteriors that IMBUE estimates after 10 steps on one CES rollout, for chi, the weights w1 to w3, and log u; each density peaks at or next to the dashed true value."
+                  />
+                </a>
+                <figcaption>
+                  Marginal posterior distributions estimated by IMBUE on a single CES rollout after
+                  <var>T</var>&nbsp;=&nbsp;10 steps. Dashed lines mark the true parameter values.
+                </figcaption>
+              </figure>
+            </section>
+
+            <!-- GP active learning (Appendix D.3, E.3) -->
+            <section class="tab-panel" id="more-gp" aria-labelledby="more-gp-title">
+              <h3 class="tab-panel__title" id="more-gp-title">GP active learning</h3>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/gp/gp_design_trajectory.png" title="Enlarge figure">
+                  <img
+                    src="static/images/gp/gp_design_trajectory.png"
+                    width="2160"
+                    height="1085"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Fifteen small plots, one per step from t = 1 to 15, of an IMBUE rollout on a synthetic 1D function: as observations accumulate, the predicted mean converges to the dashed ground truth and the shaded uncertainty band narrows; a red dashed line marks the next query."
+                  />
+                </a>
+                <figcaption>
+                  One IMBUE rollout on a synthetic GP function over <var>T</var>&nbsp;=&nbsp;15 steps: ground
+                  truth (orange dashed), predictive mean (blue) with 95% predictive band, accumulated
+                  context (orange dots) and next query (red dashed line). The predictive mean
+                  approaches the ground truth and uncertainty decreases near queried locations.
+                </figcaption>
+              </figure>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/gp/gp_baselines_extended.png" title="Enlarge figure">
+                  <img
+                    src="static/images/gp/gp_baselines_extended.png"
+                    width="2160"
+                    height="538"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Four line charts of RMSE over 15 steps (Synthetic, Forrester, Higdon, Gramacy and Lee) comparing GP-RS, GP-US, GP-VR, GP-star, ALINE, ALINE-star, IMBUE with K = 0 and IMBUE with five relevant instances. IMBUE with five relevant instances ends below GP-star and ALINE-star in every panel; GP-star and ALINE-star start low but improve little."
+                  />
+                </a>
+                <figcaption>
+                  Extended baseline comparison (RMSE ↓, mean and 95% CI over 100 rollouts). Without
+                  previous instances, IMBUE performs similarly to ALINE and is competitive with the GP
+                  baselines (random sampling, uncertainty sampling, variance reduction).
+                  GP<sup>*</sup> and ALINE<sup>*</sup> start lower than their counterparts without
+                  previous instances but improve less as new observations are collected; with relevant
+                  previous instances, IMBUE attains lower final RMSE than both.
+                </figcaption>
+              </figure>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/gp/gp_mixed_relevance_per_step.png" title="Enlarge figure">
+                  <img
+                    src="static/images/gp/gp_mixed_relevance_per_step.png"
+                    width="2160"
+                    height="1391"
+                    loading="lazy"
+                    decoding="async"
+                    alt="A grid of RMSE curves over 15 steps: rows are the four benchmarks; columns are K = 0 and then the composition of the five previous instances, from 5 relevant and 0 irrelevant to 0 relevant and 5 irrelevant. IMBUE keeps decreasing in every panel, while GP-star and ALINE-star improve little and sit higher as more instances are irrelevant."
+                  />
+                </a>
+                <figcaption>
+                  RMSE at each step for every composition of the <var>K</var>&nbsp;=&nbsp;5 previous instances
+                  (relevant / irrelevant); the leftmost column is the <var>K</var>&nbsp;=&nbsp;0 baseline. When
+                  irrelevant instances are included, IMBUE continues to reduce RMSE as observations
+                  accumulate, reaching final RMSE close to its <var>K</var>&nbsp;=&nbsp;0 performance.
+                </figcaption>
+              </figure>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/gp/gp_benchmark_functions.png" title="Enlarge figure">
+                  <img
+                    src="static/images/gp/gp_benchmark_functions.png"
+                    width="2160"
+                    height="654"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Plots of the three analytic test functions on their native domains: Forrester on 0 to 1, Higdon on 0 to 20, and Gramacy and Lee on 0.5 to 2.5."
+                  />
+                </a>
+                <figcaption>
+                  The three analytic 1D benchmark functions with the output scaling used at
+                  evaluation; the horizontal axes keep their native input coordinates.
+                </figcaption>
+              </figure>
+              <figure class="figure figure--medium">
+                <a class="figure__frame zoom" href="static/images/gp/gp_previous_instance_samples.png" title="Enlarge figure">
+                  <img
+                    src="static/images/gp/gp_previous_instance_samples.png"
+                    width="1400"
+                    height="1418"
+                    loading="lazy"
+                    decoding="async"
+                    alt="A five-by-four grid of training examples, each with a target function drawn dashed and up to three previous instances drawn as colored points: filled circles for relevant instances, crosses for irrelevant ones. Panel titles name the kernel of the target."
+                  />
+                </a>
+                <figcaption>
+                  Examples of previous instances supplied during training. Each panel shows one target
+                  function (black dashed line) and up to three instances (colored points), with filled
+                  circles for the relevant regime and crosses for the irrelevant regime.
+                </figcaption>
+              </figure>
+            </section>
+
+            <!-- Psychometric (Appendix E.4, E.5) -->
+            <section class="tab-panel" id="more-psy" aria-labelledby="more-psy-title">
+              <h3 class="tab-panel__title" id="more-psy-title">Psychometric</h3>
+              <figure class="figure">
+                <a class="figure__frame zoom" href="static/images/psy/psy_rmse_by_k.png" title="Enlarge figure">
+                  <img
+                    src="static/images/psy/psy_rmse_by_k.png"
+                    width="2160"
+                    height="520"
+                    loading="lazy"
+                    decoding="async"
+                    alt="Five line charts of joint RMSE over 30 steps on the psychometric task for K = 0, relevant K = 1 and 5, and irrelevant K = 1 and 5, comparing ALINE-star, IMBUE without the filter, IMBUE, Psi-marginal and QUEST+. With five relevant instances IMBUE stays lowest throughout; ALINE-star barely improves with relevant instances and stays far above the others with irrelevant ones; with five irrelevant instances, IMBUE without the filter stays above IMBUE early in the rollout."
+                  />
+                </a>
+                <figcaption>
+                  Joint RMSE on <span class="math">(<var>θ</var><sub>threshold</sub>, <var>θ</var><sub>slope</sub>)</span>
+                  (↓) over <var>T</var>&nbsp;=&nbsp;30 steps (mean ± 95% CI, 500 rollouts); QUEST+ and
+                  Psi-marginal use no previous instances. Relevant instances accelerate the reduction
+                  in IMBUE's RMSE, with greater benefits when more are supplied, whereas
+                  ALINE<sup>*</sup> does not improve over its <var>K</var>&nbsp;=&nbsp;0 baseline. With
+                  irrelevant instances, IMBUE stays close to its <var>K</var>&nbsp;=&nbsp;0 RMSE while
+                  ALINE<sup>*</sup>'s RMSE increases with <var>K</var>, and the full IMBUE keeps a
+                  lower RMSE than IMBUE without the filter, with a larger and more persistent gap when
+                  more irrelevant instances are supplied.
+                </figcaption>
+              </figure>
+            </section>
+
+            <!-- Deployment shifts absent from training (Appendix E.6) -->
+            <section class="tab-panel" id="more-shifts" aria-labelledby="more-shifts-title">
+              <h3 class="tab-panel__title" id="more-shifts-title">Deployment shifts</h3>
+              <div class="prose">
+                <p>
+                  The trained models are evaluated, without retraining, under three shifts that are
+                  not in the training mixture. IMBUE does not degrade sharply in any of them. These
+                  are three specific, plausible shifts and do not establish robustness to arbitrary
+                  deployment mismatch.
+                </p>
+                <p>
+                  <strong>Biased but partially relevant instances (CES).</strong> All
+                  <var>K</var>&nbsp;=&nbsp;5 instances are generated as in the relevant regime but share a
+                  systematic shift on a randomly selected subset of the parameters, so each is
+                  informative about the unshifted parameters and misleading about the shifted ones.
+                  IMBUE stays close to its <var>K</var>&nbsp;=&nbsp;0 performance, while
+                  deployment-time concatenation degrades (Biased column of the
+                  <a href="#table-ablation">staged ablation</a>).
+                </p>
+                <p>
+                  <strong>A different noise model in the previous instances (CES).</strong> Instance
+                  outcomes carry heavier-tailed Student-<var>t</var> noise at a larger scale instead
+                  of the Gaussian noise used in training. Relevant instances remain beneficial, and
+                  irrelevant ones leave performance close to <var>K</var>&nbsp;=&nbsp;0.
+                </p>
+              </div>
+              <figure class="table-figure table-figure--narrow">
+                <figcaption id="table-noise">
+                  CES with <var>K</var>&nbsp;=&nbsp;5 instances whose outcomes carry Student-<var>t</var> noise
+                  (<span class="math"><var>ν</var>&nbsp;=&nbsp;3</span>, scale <span class="math">3<var>σ</var><sub>CES</sub></span>) instead of the Gaussian noise
+                  used in training. sPCE at <var>T</var>&nbsp;=&nbsp;10 (mean ± 95% CI, 2,000 rollouts).
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="table-noise" tabindex="0">
+                  <table class="results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Condition</th>
+                        <th scope="col">sPCE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row"><var>K</var>&nbsp;=&nbsp;0</th><td>13.46 <span class="ci">± 0.15</span></td></tr>
+                      <tr><th scope="row"><var>K</var>&nbsp;=&nbsp;5 relevant, Gaussian noise (in-dist.)</th><td>13.93 <span class="ci">± 0.12</span></td></tr>
+                      <tr><th scope="row"><var>K</var>&nbsp;=&nbsp;5 relevant, Student-<var>t</var> noise (shift)</th><td>14.00 <span class="ci">± 0.12</span></td></tr>
+                      <tr><th scope="row"><var>K</var>&nbsp;=&nbsp;5 irrelevant, Gaussian noise (in-dist.)</th><td>13.14 <span class="ci">± 0.16</span></td></tr>
+                      <tr><th scope="row"><var>K</var>&nbsp;=&nbsp;5 irrelevant, Student-<var>t</var> noise (shift)</th><td>13.32 <span class="ci">± 0.16</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+              <div class="prose">
+                <p>
+                  <strong>Priors with incorrect support (Location Finding).</strong> The supplied
+                  prior assigns exactly zero probability to the bin containing the true parameter:
+                  a <em>truncated</em> prior concentrates its mass in a window away from it, and a
+                  <em>boundary</em> prior places its mass at the two ends of the support. There is no
+                  sharp degradation in sPCE under either.
+                </p>
+              </div>
+              <figure class="table-figure table-figure--narrow">
+                <figcaption id="table-support">
+                  Location Finding under priors that assign zero mass to the bin containing the true
+                  parameter, alongside the three in-distribution prior types. sPCE (mean ± 95% CI,
+                  2,000 rollouts) at four experiment steps.
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="table-support" tabindex="0">
+                  <table class="results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Prior</th>
+                        <th scope="col"><var>t</var>&nbsp;=&nbsp;2</th>
+                        <th scope="col"><var>t</var>&nbsp;=&nbsp;5</th>
+                        <th scope="col"><var>t</var>&nbsp;=&nbsp;11</th>
+                        <th scope="col"><var>t</var>&nbsp;=&nbsp;20</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Strong (in-dist.)</th>
+                        <td>2.26 <span class="ci">± 0.07</span></td>
+                        <td>5.77 <span class="ci">± 0.11</span></td>
+                        <td>10.49 <span class="ci">± 0.11</span></td>
+                        <td>13.03 <span class="ci">± 0.06</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Uniform (in-dist.)</th>
+                        <td>1.72 <span class="ci">± 0.06</span></td>
+                        <td>4.25 <span class="ci">± 0.09</span></td>
+                        <td>9.10 <span class="ci">± 0.12</span></td>
+                        <td>12.83 <span class="ci">± 0.07</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Miscalibrated (in-dist.)</th>
+                        <td>1.56 <span class="ci">± 0.05</span></td>
+                        <td>3.90 <span class="ci">± 0.08</span></td>
+                        <td>8.43 <span class="ci">± 0.11</span></td>
+                        <td>12.61 <span class="ci">± 0.07</span></td>
+                      </tr>
+                    </tbody>
+                    <tbody>
+                      <tr>
+                        <th scope="row">Truncated (shift)</th>
+                        <td>1.46 <span class="ci">± 0.05</span></td>
+                        <td>3.89 <span class="ci">± 0.08</span></td>
+                        <td>8.54 <span class="ci">± 0.11</span></td>
+                        <td>12.56 <span class="ci">± 0.07</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Boundary (shift)</th>
+                        <td>1.76 <span class="ci">± 0.06</span></td>
+                        <td>4.27 <span class="ci">± 0.09</span></td>
+                        <td>9.12 <span class="ci">± 0.11</span></td>
+                        <td>12.77 <span class="ci">± 0.06</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+            </section>
+
+            <!-- Compute (Appendix E.3, E.8, F) -->
+            <section class="tab-panel" id="more-compute" aria-labelledby="more-compute-title">
+              <h3 class="tab-panel__title" id="more-compute-title">Compute</h3>
+              <div class="prose">
+                <p>
+                  On both CES and Location Finding, the full model keeps per-step inference time in the
+                  millisecond range. The reliability
+                  filter has 9,089 parameters, independent of <var>K</var>, the number of histogram
+                  bins and the task: 6.3% of the full CES model (145,408 parameters) and 7.3% of the
+                  full Location Finding model (123,744 parameters). At this scale the 2,000
+                  candidate tokens dominate the sequence, so shortening the in-context segment from
+                  <span class="math"><var>K</var>·<var>T</var>&nbsp;=&nbsp;50</span> concatenated observations to <var>K</var>&nbsp;=&nbsp;5
+                  instance tokens brings little latency benefit. The advantage of the token interface
+                  appears at larger <var>K</var> and <var>T</var>, since the in-context segment of
+                  ALINE<sup>*</sup> grows as <span class="math"><var>K</var>·<var>T</var></span> whereas that of IMBUE grows as
+                  <var>K</var>, so concatenation eventually exceeds the sequence-length budget.
+                </p>
+              </div>
+              <figure class="table-figure table-figure--narrow">
+                <figcaption id="table-latency">
+                  Per-step inference latency of IMBUE by module (ms per step, mean ± standard
+                  deviation over 10 runs; NVIDIA H100, batch size 1, 2,000 candidate designs). On CES
+                  the in-context input is <var>K</var>&nbsp;=&nbsp;5 instances; on Location Finding it is the
+                  prior histogram.
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="table-latency" tabindex="0">
+                  <table class="results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Configuration</th>
+                        <th scope="col">CES</th>
+                        <th scope="col">Location Finding</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">No in-context tokens</th>
+                        <td>2.55 <span class="ci">± 0.003</span></td>
+                        <td class="na"><span aria-hidden="true">—</span><span class="visually-hidden">not reported</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">In-context tokens, w/o filter</th>
+                        <td>3.62 <span class="ci">± 0.003</span></td>
+                        <td>2.56 <span class="ci">± 0.002</span></td>
+                      </tr>
+                      <tr class="ours">
+                        <th scope="row">In-context tokens + filter (full)</th>
+                        <td>4.57 <span class="ci">± 0.005</span></td>
+                        <td>3.28 <span class="ci">± 0.003</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+              <div class="prose">
+                <p>
+                  On the GP benchmarks, IMBUE at <var>K</var>&nbsp;=&nbsp;0 has inference time comparable to
+                  ALINE. With five relevant previous instances it remains substantially faster than
+                  the GP variants, which refit their models at each step, at a small absolute increase
+                  over ALINE for instance encoding and reliability filtering.
+                </p>
+              </div>
+              <figure class="table-figure">
+                <figcaption id="table-gp-time">
+                  Total inference time for rollouts of 15 steps on four GP benchmarks (mean ±
+                  standard deviation in seconds, 10 runs).
+                </figcaption>
+                <div class="table-wrap" role="region" aria-labelledby="table-gp-time" tabindex="0">
+                  <table class="results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Method</th>
+                        <th scope="col">Synthetic 1D</th>
+                        <th scope="col">Forrester</th>
+                        <th scope="col">Higdon</th>
+                        <th scope="col">Gramacy &amp; Lee</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">GP-RS</th>
+                        <td>0.332 <span class="ci">± 0.020</span></td>
+                        <td>0.343 <span class="ci">± 0.029</span></td>
+                        <td>0.305 <span class="ci">± 0.024</span></td>
+                        <td>0.300 <span class="ci">± 0.022</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">GP-US</th>
+                        <td>0.408 <span class="ci">± 0.024</span></td>
+                        <td>0.381 <span class="ci">± 0.020</span></td>
+                        <td>0.397 <span class="ci">± 0.023</span></td>
+                        <td>0.399 <span class="ci">± 0.027</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">GP-VR</th>
+                        <td>1.236 <span class="ci">± 0.037</span></td>
+                        <td>1.242 <span class="ci">± 0.020</span></td>
+                        <td>1.240 <span class="ci">± 0.027</span></td>
+                        <td>1.216 <span class="ci">± 0.033</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">GP<sup>*</sup> (<var>K</var>&nbsp;=&nbsp;5 rel.)</th>
+                        <td>0.556 <span class="ci">± 0.068</span></td>
+                        <td>0.640 <span class="ci">± 0.036</span></td>
+                        <td>0.648 <span class="ci">± 0.050</span></td>
+                        <td>0.649 <span class="ci">± 0.087</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row">ALINE</th>
+                        <td>0.047 <span class="ci">± 0.000</span></td>
+                        <td>0.049 <span class="ci">± 0.003</span></td>
+                        <td>0.049 <span class="ci">± 0.003</span></td>
+                        <td>0.048 <span class="ci">± 0.003</span></td>
+                      </tr>
+                    </tbody>
+                    <tbody>
+                      <tr class="ours">
+                        <th scope="row">IMBUE (<var>K</var>&nbsp;=&nbsp;0)</th>
+                        <td>0.049 <span class="ci">± 0.004</span></td>
+                        <td>0.047 <span class="ci">± 0.000</span></td>
+                        <td>0.047 <span class="ci">± 0.000</span></td>
+                        <td>0.047 <span class="ci">± 0.000</span></td>
+                      </tr>
+                      <tr class="ours">
+                        <th scope="row">IMBUE (<var>K</var>&nbsp;=&nbsp;5 rel.)</th>
+                        <td>0.074 <span class="ci">± 0.000</span></td>
+                        <td>0.075 <span class="ci">± 0.005</span></td>
+                        <td>0.075 <span class="ci">± 0.004</span></td>
+                        <td>0.075 <span class="ci">± 0.005</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </figure>
+              <p class="prose finding__note">
+                All experiments ran on NVIDIA H100 80GB GPUs, about 4,000 GPU hours in total across
+                all stages. Training an IMBUE model for 10<sup>5</sup> epochs takes roughly 7 hours
+                per benchmark.
+              </p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Limitations (from "Limitations and future work")
+           ============================================================ -->
+      <section id="limitations" class="section" aria-labelledby="limitations-title">
+        <div class="container prose">
+          <h2 id="limitations-title">Limitations</h2>
+          <ul class="limitations">
+            <li>
+              The in-context knowledge is structured: priors are histograms and previous instances
+              are sequences of design–outcome pairs. Admitting richer forms, such as natural-language
+              task descriptions, would bring amortized BED closer to the settings in which domain
+              experts naturally encode their knowledge.
+            </li>
+            <li>
+              Priors enter as parameter-wise marginals, so parameter dependencies are not
+              represented.
+            </li>
+            <li>
+              The likelihood, design and observation spaces are assumed to stay within the trained
+              task family; the paper probes three specific deployment shifts.
+            </li>
+            <li>
+              The main qualitative conclusions hold across the tested candidate-pool sizes and
+              constructions, but candidate enumeration does not scale to very high-dimensional
+              designs; extending IMBUE to continuous design spaces through actor-critic formulations
+              would broaden its applicability.
+            </li>
+            <li>
+              The filter is less reliable in the first few rounds, when the limited experimental
+              history makes it difficult to distinguish informative from misleading external inputs.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Citation (BibTeX)
+           ============================================================ -->
+      <section id="citation" class="section section--tint" aria-labelledby="citation-title">
+        <div class="container prose prose--code">
+          <h2 id="citation-title">Citation</h2>
+          <div class="code-block">
+            <div class="code-block__bar">
+              <span class="code-block__label">BibTeX</span>
+              <span class="copy-status" role="status" aria-live="polite"></span>
+              <button type="button" class="copy-btn" data-copy="bibtex-entry" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+                <span class="copy-btn__label">Copy</span>
+              </button>
+            </div>
+            <!-- TODO: 论文集正式出版后补上 volume / pages / url（ALINE 在 ref.bib 中是 volume={38}），
+                 或在出 arXiv 版本后另附 eprint 字段。 -->
+            <pre><code id="bibtex-entry">@inproceedings{zhao2026amortized,
+  title     = {Amortized {Bayesian} Experimental Design with In-Context Knowledge Conditioning},
+  author    = {Zhao, Zhanghu and Huang, Daolang and Wen, Xinyi and Kaski, Samuel},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           Acknowledgments (verbatim from the paper)
+           ============================================================ -->
+      <section id="acknowledgments" class="section section--tint" aria-labelledby="ack-title">
+        <div class="container prose">
+          <h2 id="ack-title">Acknowledgments</h2>
+          <p class="ack">
+            This work was supported by the ERC (grant ODD-ML 101201120) and the Research Council of
+            Finland (Flagship programme: Finnish Center for Artificial Intelligence FCAI, decision
+            359207). The authors acknowledge the research environment provided by ELLIS Institute
+            Finland. SK was also supported by the UKRI Turing AI World-Leading Researcher Fellowship,
+            [EP/W002973/1]. The authors wish to thank the Aalto Science–IT project and CSC–IT Center
+            for Science, Finland, for the computational and data storage resources provided. Views
+            and opinions expressed are however those of the author(s) only and do not necessarily
+            reflect those of the European Union or the European Research Council Executive Agency.
+            Neither the European Union nor the granting authority can be held responsible for them.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============================================================
+         Footer: template credit and licence
+         ============================================================ -->
+    <footer class="site-footer">
+      <div class="container prose">
+        <!-- TODO: 许可证按 Nerfies 系项目页的惯例选了 CC BY-SA 4.0，请确认。 -->
+        <p>
+          Page layout follows the <a href="https://nerfies.github.io/">Nerfies</a> project page
+          (<a href="https://github.com/nerfies/nerfies.github.io">source</a>). This website is
+          licensed under a
+          <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons
+          Attribution-ShareAlike 4.0 International License</a>.
+        </p>
+        <p>
+          <a href="https://zhanghu-zhao.com/publications/">More publications by Zhanghu Zhao</a>.
+          Light by day, dark by night, following the sun over Helsinki; the button in the top bar
+          overrides it.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Figure zoom. Without JavaScript, a figure link opens the PNG itself. -->
+    <dialog class="lightbox" id="lightbox" aria-label="Enlarged figure" aria-describedby="lightbox-caption">
+      <div class="lightbox__panel">
+        <div class="lightbox__bar">
+          <button type="button" class="lightbox__close" aria-label="Close enlarged figure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+          </button>
+        </div>
+        <div class="lightbox__scroll">
+          <img class="lightbox__img" alt="" />
+        </div>
+        <div class="lightbox__caption" id="lightbox-caption"></div>
+      </div>
+    </dialog>
+  </body>
+</html>

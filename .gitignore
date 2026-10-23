@@ -3,3 +3,5 @@
 .DS_Store
 **/.DS_Store
 examples/
+# IMBUE paper sources (LaTeX, .sty, .bib, vector figures): local only, never published
+imbue/_source/

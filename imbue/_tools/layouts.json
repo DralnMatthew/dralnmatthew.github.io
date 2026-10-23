@@ -1,0 +1,58 @@
+{
+  "overview-mobile": {
+    "src": "../_source/fig/overview.pdf",
+    "out": "../static/images/overview-mobile.png",
+    "width": 1080, "pad": 14, "gap": 40, "hgap": 28,
+    "rows": [
+      { "group": "boxes", "tiles": [[0.0009, 0, 0.3426, 1]] },
+      { "group": "boxes", "tiles": [[0.3556, 0, 0.7685, 1]] },
+      { "group": "plots", "tiles": [[0.7745, 0.0303, 1, 0.4444], [0.7745, 0.4444, 1, 0.8788]] },
+      { "group": "plots", "gap": 14, "hgap": 50, "tiles": [[0.8009, 0.8869, 0.9167, 0.9384], [0.8009, 0.9384, 0.9963, 0.9980]] }
+    ]
+  },
+  "architecture-mobile": {
+    "src": "../_source/fig/architecture.pdf",
+    "out": "../static/images/architecture-mobile.png",
+    "width": 1080, "pad": 14, "gap": 36,
+    "rows": [
+      { "tiles": [[0.0046, 0.0215, 0.5625, 0.9839]] },
+      { "tiles": [[0.5718, 0.0215, 0.9981, 0.9839]] }
+    ]
+  },
+  "ces_naive_concatenation_k5-mobile": {
+    "src": "../_source/fig/ces/ces_naive_concatenation_k5.pdf",
+    "out": "../static/images/ces/ces_naive_concatenation_k5-mobile.png",
+    "width": 1080, "pad": 14, "gap": 32, "hgap": 36,
+    "rows": [
+      { "group": "legend", "tiles": [[0.0071, 0.9178, 0.3607, 0.9890], [0.4057, 0.9178, 0.5800, 0.9890]] },
+      { "group": "legend", "gap": 4, "tiles": [[0.6271, 0.9178, 0.7893, 0.9890], [0.8329, 0.9178, 0.9929, 0.9890]] },
+      { "group": "plots", "tiles": [[0, 0, 0.5371, 0.9034]] },
+      { "group": "plots", "hgap": 0, "tiles": [[0, 0, 0.1307, 0.9034], [0.5393, 0, 0.9500, 0.9034]] }
+    ]
+  },
+  "gp_mixed_relevance-mobile": {
+    "src": "../_source/fig/gp/gp_mixed_relevance.pdf",
+    "out": "../static/images/gp/gp_mixed_relevance-mobile.png",
+    "width": 1080, "pad": 14, "gap": 36, "hgap": 36,
+    "groups": { "plots": { "maxWidth": 936 } },
+    "rows": [
+      { "group": "legend", "tiles": [[0.1954, 0.8911, 0.2995, 0.9756], [0.3375, 0.8911, 0.4745, 0.9756]] },
+      { "group": "legend", "gap": 4, "tiles": [[0.5130, 0.8911, 0.6435, 0.9756], [0.6764, 0.8911, 0.8037, 0.9756]] },
+      { "group": "plots", "tiles": [[0, 0, 0.26678, 0.8455]] },
+      { "group": "plots", "hgap": 6, "tiles": [[0, 0, 0.0176, 0.8455],
+        { "crop": [0.26678, 0, 0.51125, 0.8455], "erase": [[0.26678, 0.6732, 0.26727, 0.6829]] }] },
+      { "group": "plots", "hgap": 6, "tiles": [[0, 0, 0.0176, 0.8455],
+        { "crop": [0.51125, 0, 0.75572, 0.8455], "erase": [[0.51125, 0.6732, 0.51174, 0.6829]] }] },
+      { "group": "plots", "hgap": 6, "tiles": [[0, 0, 0.0176, 0.8455],
+        { "crop": [0.75572, 0, 1, 0.8455], "erase": [[0.75572, 0.6732, 0.75620, 0.6829]] }] }
+    ]
+  },
+  "card-schematic": {
+    "src": "../_source/fig/overview.pdf",
+    "out": "card-schematic.png",
+    "width": 900,
+    "rows": [
+      { "tiles": [[0.3657, 0.1010, 0.7546, 0.9697]] }
+    ]
+  }
+}

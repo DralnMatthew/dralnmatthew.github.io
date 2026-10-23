@@ -10,6 +10,10 @@ The layout is adapted from [Jon Barron's website](https://jonbarron.info/).
 - `stylesheet.css`: styles for all three pages, including the light and dark
   themes
 - `theme.js`: sets the theme from sunrise and sunset in Helsinki and runs the toggle
+- `imbue/`: the project page for the NeurIPS 2026 IMBUE paper, served at
+  https://zhanghu-zhao.com/imbue/. It is self-contained (its own HTML, CSS
+  and JS, not the header and tabs above); see `imbue/README.md`. The paper
+  sources sit in `imbue/_source/`, which is gitignored.
 
 The three pages share the same header (photo, name, intro, contact links)
 and the row of tabs under it: About, Publications, CV. Each tab is a

@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- Source of static/images/social-card.png, the 1200 x 630 preview that
+     LinkedIn, Slack, X and others show when the page is shared. Built from
+     the name, the one-line claim and the IMBUE panel of the overview figure
+     (card-schematic.png, from layouts.json), so it stays legible as a small
+     thumbnail. Rebuild it with the Chrome command in imbue/README.md. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>IMBUE social card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      /* the page's own palette (style.css, light theme) */
+      :root {
+        --accent: #0173b2;
+        --accent-soft: rgba(1, 115, 178, 0.09);
+        --ink: #1f2933;
+        --ink-strong: #0f1720;
+        --muted: #5b6672;
+        --rule: #e3e8ee;
+      }
+
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        margin: 0;
+        overflow: hidden;
+        background: #ffffff;
+      }
+
+      body {
+        color: var(--ink);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        position: relative;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 440px;
+        column-gap: 56px;
+        width: 1200px;
+        height: 630px;
+        padding: 58px 64px 54px 80px;
+      }
+
+      /* a band of the accent down the left edge, so the card reads as one
+         piece next to other previews */
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 14px;
+        background: var(--accent);
+      }
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .venue {
+        align-self: flex-start;
+        margin: 0;
+        padding: 8px 18px 7px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .name {
+        margin: 20px 0 0;
+        color: var(--ink-strong);
+        font-size: 140px;
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.035em;
+      }
+
+      .claim {
+        margin: 26px 0 0;
+        color: var(--ink);
+        font-size: 40px;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.018em;
+      }
+
+      .claim em {
+        color: var(--accent);
+        font-style: normal;
+      }
+
+      .meta {
+        margin: auto 0 0;
+        padding-top: 22px;
+        border-top: 2px solid var(--rule);
+        color: var(--muted);
+        font-size: 19px;
+        font-weight: 500;
+        line-height: 1.45;
+      }
+
+      .meta b {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      .schematic {
+        align-self: center;
+        margin: 0;
+      }
+
+      .schematic img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="text">
+        <p class="venue">NeurIPS 2026</p>
+        <h1 class="name">IMBUE</h1>
+        <p class="claim">Use priors and past experiments at deployment, <em>without retraining.</em></p>
+        <p class="meta">
+          <b>Amortized Bayesian Experimental Design with In-Context Knowledge Conditioning</b>
+          Zhanghu Zhao, Daolang Huang, Xinyi Wen, Samuel Kaski
+        </p>
+      </div>
+      <figure class="schematic">
+        <img
+          src="card-schematic.png"
+          width="900"
+          height="922"
+          alt="The IMBUE panel of the overview figure: prior, previous-instance and observation tokens pass a reliability filter, which fades some out, then a Transformer that proposes the next design."
+        />
+      </figure>
+    </main>
+  </body>
+</html>
