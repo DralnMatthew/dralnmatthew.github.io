@@ -1,11 +1,11 @@
 /* ============================================================
-   IMBUE project page: theme, top bar, figure zoom, result tabs,
+   IMBUE project page: theme, math, top bar, figure zoom,
    folded details, BibTeX copy.
 
    Loaded synchronously from <head>, so the theme is on <html> before
    the first paint; everything else waits for DOMContentLoaded. With
-   JavaScript off the page still works: light theme, every "More
-   results" panel shown in turn, and each figure links to its PNG.
+   JavaScript off the page still works: light theme, native disclosures,
+   each figure links to its PNG, and math shows as its LaTeX source.
    ============================================================ */
 (function () {
   "use strict";
@@ -13,68 +13,24 @@
   var root = document.documentElement;
 
   /* ---------- Theme ----------
-     The rule of /theme.js on zhanghu-zhao.com, repeated here so this page
-     also stands on its own: light by day and dark by night in Helsinki,
-     unless the reader picked a theme with the button. The choice is
-     stored under the same key, so it carries across the whole site. */
+     Follows the reader's system setting (prefers-color-scheme) unless
+     they pick light or dark with the button. The pick is stored under the
+     same key as on the rest of zhanghu-zhao.com, so it carries across the
+     whole site. */
   var KEY = "theme-mode"; /* stored value: "light" | "dark"; absent = auto */
-  var LAT = 60.1699,
-    LON = 24.9384;
-
-  var rad = Math.PI / 180,
-    dayMs = 864e5,
-    J1970 = 2440588,
-    J2000 = 2451545,
-    obliquity = rad * 23.4397;
-
-  /* Is the sun below the horizon in Helsinki at `now`? Standard
-     low-precision solar position formulas, good to about a minute. */
-  function isNight(now) {
-    var lw = rad * -LON,
-      phi = rad * LAT,
-      d = now.valueOf() / dayMs - 0.5 + J1970 - J2000,
-      n = Math.round(d - 0.0009 - lw / (2 * Math.PI)),
-      ds = 0.0009 + lw / (2 * Math.PI) + n,
-      M = rad * (357.5291 + 0.98560028 * ds), /* solar mean anomaly */
-      L =
-        M +
-        rad *
-          (1.9148 * Math.sin(M) +
-            0.02 * Math.sin(2 * M) +
-            0.0003 * Math.sin(3 * M)) +
-        rad * 102.9372 +
-        Math.PI, /* ecliptic longitude */
-      dec = Math.asin(Math.sin(obliquity) * Math.sin(L)),
-      correction = 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
-
-    /* -0.833° puts the upper limb of the refracted sun on the horizon */
-    var cosW =
-      (Math.sin(rad * -0.833) - Math.sin(phi) * Math.sin(dec)) /
-      (Math.cos(phi) * Math.cos(dec));
-    if (cosW > 1) return true; /* sun never rises today */
-    if (cosW < -1) return false; /* sun never sets today */
-
-    var w = Math.acos(cosW),
-      noon = J2000 + ds + correction,
-      set = J2000 + (0.0009 + (w + lw) / (2 * Math.PI) + n) + correction,
-      toDate = function (j) {
-        return new Date((j + 0.5 - J1970) * dayMs);
-      };
-
-    return now < toDate(noon - (set - noon)) || now >= toDate(set);
-  }
+  var systemDark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
   function readMode() {
     try {
       var v = localStorage.getItem(KEY);
       return v === "light" || v === "dark" ? v : "auto";
     } catch (e) {
-      return "auto"; /* private mode, blocked storage: just follow the sun */
+      return "auto"; /* private mode, blocked storage: just follow the system */
     }
   }
 
   function apply(mode) {
-    var theme = mode === "auto" ? (isNight(new Date()) ? "dark" : "light") : mode;
+    var theme = mode === "auto" ? (systemDark && systemDark.matches ? "dark" : "light") : mode;
     root.setAttribute("data-mode", mode);
     root.setAttribute("data-theme", theme);
     var meta = document.querySelector('meta[name="theme-color"]');
@@ -85,9 +41,9 @@
   apply(mode);
 
   var LABELS = {
-    auto: "Theme: Helsinki — light by day, dark by night, following sunrise and sunset there. Switch to light.",
+    auto: "Theme: automatic, following your system setting. Switch to light.",
     light: "Theme: light. Switch to dark.",
-    dark: "Theme: dark. Switch back to Helsinki daylight.",
+    dark: "Theme: dark. Switch back to automatic.",
   };
   var NEXT = { auto: "light", light: "dark", dark: "auto" };
 
@@ -112,10 +68,12 @@
     });
   }
 
-  /* A tab left open overnight should still turn dark at sunset. */
-  setInterval(function () {
+  /* In automatic mode, follow the system as it changes (e.g. at night). */
+  function onSystemChange() {
     if (mode === "auto") apply(mode);
-  }, 60000);
+  }
+  if (systemDark && systemDark.addEventListener) systemDark.addEventListener("change", onSystemChange);
+  else if (systemDark && systemDark.addListener) systemDark.addListener(onSystemChange); /* Safari < 14 */
 
   /* ---------- Top bar ----------
      Marks the link of the section being read with aria-current: the last
@@ -159,84 +117,6 @@
     update();
   }
 
-  /* ---------- Tabs (More results) ----------
-     WAI-ARIA tabs with automatic activation: click, or arrow keys and
-     Home/End on the strip. A URL fragment that points at a panel, or at
-     anything inside one, opens that panel; picking a tab writes its
-     panel's id into the URL so the view can be linked. */
-  function initTabs() {
-    var groups = document.querySelectorAll("[data-tabs]");
-    Array.prototype.forEach.call(groups, function (group) {
-      var tablist = group.querySelector('[role="tablist"]');
-      var tabs = Array.prototype.slice.call(group.querySelectorAll('[role="tab"]'));
-      var panels = tabs.map(function (tab) {
-        return document.getElementById(tab.getAttribute("aria-controls"));
-      });
-      if (!tablist || !tabs.length || panels.indexOf(null) !== -1) return;
-
-      panels.forEach(function (panel, i) {
-        panel.setAttribute("role", "tabpanel");
-        panel.setAttribute("aria-labelledby", tabs[i].id);
-      });
-
-      function select(index, moveFocus) {
-        tabs.forEach(function (tab, i) {
-          var on = i === index;
-          tab.setAttribute("aria-selected", on ? "true" : "false");
-          tab.tabIndex = on ? 0 : -1;
-          panels[i].hidden = !on;
-        });
-        if (moveFocus) tabs[index].focus();
-      }
-
-      function remember(index) {
-        if (history.replaceState) history.replaceState(null, "", "#" + panels[index].id);
-      }
-
-      function followHash() {
-        var target = null;
-        try {
-          var id = decodeURIComponent(location.hash.slice(1));
-          target = id ? document.getElementById(id) : null;
-        } catch (e) {}
-        if (!target) return false;
-        for (var i = 0; i < panels.length; i++) {
-          if (panels[i].contains(target)) {
-            select(i, false);
-            /* the panel was hidden when the browser tried to scroll to it */
-            (target === panels[i] ? tablist : target).scrollIntoView({ block: "start" });
-            return true;
-          }
-        }
-        return false;
-      }
-
-      tabs.forEach(function (tab, i) {
-        tab.addEventListener("click", function () {
-          select(i, false);
-          remember(i);
-        });
-        tab.addEventListener("keydown", function (event) {
-          var last = tabs.length - 1,
-            next = null;
-          if (event.key === "ArrowRight") next = i === last ? 0 : i + 1;
-          else if (event.key === "ArrowLeft") next = i === 0 ? last : i - 1;
-          else if (event.key === "Home") next = 0;
-          else if (event.key === "End") next = last;
-          if (next === null) return;
-          event.preventDefault();
-          select(next, true);
-          remember(next);
-        });
-      });
-
-      tablist.hidden = false;
-      group.classList.add("is-enhanced");
-      if (!followHash()) select(0, false);
-      window.addEventListener("hashchange", followHash);
-    });
-  }
-
   /* ---------- Figure zoom ----------
      Every figure is wrapped in <a class="zoom" href="full.png">. Here a
      plain click opens that image in a modal <dialog> with the figure's
@@ -271,7 +151,7 @@
       /* On phones the image opens at half its pixel width (its 2x size),
          wider than the screen, so dense plots can be panned. */
       dialog.style.setProperty("--zoom-width", width ? Math.round(width / 2) + "px" : "100%");
-      /* the caption is the page's own markup, so its <sub>/<var> survive */
+      /* the caption is the page's own markup, so its rendered math survives */
       caption.innerHTML = figcaption ? figcaption.innerHTML : "";
       caption.hidden = !figcaption;
       opener = link;
@@ -403,10 +283,26 @@
     });
   }
 
+  /* ---------- Math ----------
+     KaTeX and its auto-render extension load with `defer` in <head>, so
+     they are ready by DOMContentLoaded. Math is rendered before anything
+     measures or scrolls the page, since it changes the layout. If the CDN
+     cannot be reached, the LaTeX source simply stays as text. */
+  function initMath() {
+    if (typeof window.renderMathInElement !== "function") return;
+    window.renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false },
+      ],
+      throwOnError: false,
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    initMath();
     initThemeToggle();
     initTopbar();
-    initTabs();
     initDetails();
     initLightbox();
     initCopy();

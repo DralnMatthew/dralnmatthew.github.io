@@ -2,9 +2,9 @@
    IMBUE project page
    One stylesheet, no build step. Every colour is a token on :root;
    the dark theme redefines the same names under [data-theme="dark"],
-   which script.js sets before the first paint (light by day, dark by
-   night in Helsinki, unless the reader overrides it). Change the
-   palette here and nowhere else.
+   which script.js sets before the first paint (following the reader's
+   system setting, unless they pick a theme with the button). Change
+   the palette here and nowhere else.
    ============================================================ */
 
 /* ---------- Design tokens ---------- */
@@ -14,13 +14,12 @@
     "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
-  /* math (K, T, θ, ∈, ℝ ...) in a serif with full math coverage, so the
-     symbols match each other as they do in the paper */
-  --font-math: "STIX Two Text", "STIX Two Math", "Cambria Math", Cambria,
-    "Latin Modern Math", "Times New Roman", Times, "Noto Serif", serif;
+  /* math is set by KaTeX in its own fonts, as in the paper (see .katex) */
 
-  --wide: 1080px;  /* figures, tables, cards */
-  --prose: 760px;  /* running text, about 80 characters a line */
+  /* One column below the header, as on the ALINE page: headings, text,
+     figures, tables and captions share both edges. */
+  --measure: 960px;
+  --narrow: 600px; /* near-square plots, centred in the column */
   --gutter: 24px;
   --topbar-h: 56px;
 
@@ -48,10 +47,17 @@
   --code-bg: #f3f5f7;
   --topbar-bg: rgba(255, 255, 255, 0.86);
 
+  --hero-bg: linear-gradient(125deg, #101d31, #163d59);
+  --hero-ink: #f4f7fb;
+  --hero-muted: #bfd0df;
+  --hero-accent: #8dd8ff;
+  --hero-accent-strong: #b9e8ff;
+  --hero-soft: rgba(141, 216, 255, 0.12);
+  --hero-button-ink: #122a42;
+  --hero-rule: rgba(191, 208, 223, 0.4);
+
   --figure-bg: #ffffff;   /* plots keep their white paper in both themes */
   --figure-border: var(--rule);
-  --mark-bg: #0f1720;     /* numbered marks on a plot, so on white in both themes */
-  --mark-ink: #ffffff;
 
   --btn-bg: #1f2933;      /* dark pills, as on most project pages */
   --btn-ink: #ffffff;
@@ -87,6 +93,7 @@
   --hover-bg: rgba(255, 255, 255, 0.06);
   --code-bg: #171a1e;
   --topbar-bg: rgba(20, 22, 26, 0.86);
+  --hero-bg: linear-gradient(125deg, #0e1726, #142f45);
 
   --figure-bg: #ffffff;
   --figure-border: transparent;
@@ -123,7 +130,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 17px;
+  font-size: 18px; /* about 100 characters a line across the column */
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -143,7 +150,8 @@ p {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   color: var(--ink-strong);
   text-wrap: balance;
 }
@@ -154,7 +162,7 @@ h2 {
   line-height: 1.25;
   letter-spacing: -0.015em;
   font-weight: 700;
-  text-align: center;
+  text-align: left;
 }
 
 h3 {
@@ -162,6 +170,13 @@ h3 {
   font-size: 1.2rem;
   line-height: 1.35;
   letter-spacing: -0.01em;
+  font-weight: 650;
+}
+
+h4 {
+  margin: 32px 0 8px;
+  font-size: 1.15rem;
+  line-height: 1.4;
   font-weight: 650;
 }
 
@@ -188,22 +203,25 @@ strong {
   color: var(--ink-strong);
 }
 
-var {
-  font-family: var(--font-math);
-  font-style: italic;
-  font-size: 1.08em;
-  line-height: 1;
-}
-
-/* a whole expression such as θ ∈ ℝ⁵: one font, never broken across lines */
-.math {
-  font-family: var(--font-math);
-  font-size: 1.06em;
+/* KaTeX's default 1.21em is sized against Computer Modern; next to Inter
+   a little smaller sits better. Inline math stays on one line instead of
+   breaking after "=" or "∼" as KaTeX otherwise allows. */
+.katex {
+  font-size: 1.1em;
   white-space: nowrap;
 }
 
-.math var {
-  font-size: 1em;
+/* Display equations scroll sideways inside their own box on a phone
+   instead of widening the page. */
+.eq {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 4px 0 16px;
+}
+
+.eq .katex-display {
+  margin: 0;
+  padding: 6px 0;
 }
 
 sub,
@@ -256,25 +274,13 @@ sub {
 }
 
 /* ---------- Layout ---------- */
+/* Everything inside fills the column, so text, figures, tables and
+   captions line up on both sides. */
 .container {
   width: 100%;
-  max-width: calc(var(--wide) + 2 * var(--gutter));
+  max-width: calc(var(--measure) + 2 * var(--gutter));
   margin-inline: auto;
   padding-inline: var(--gutter);
-}
-
-.prose {
-  max-width: var(--prose);
-  margin-inline: auto;
-}
-
-.container.prose {
-  max-width: calc(var(--prose) + 2 * var(--gutter));
-}
-
-/* wide enough for the longest BibTeX line without scrolling on desktop */
-.container.prose.prose--code {
-  max-width: calc(920px + 2 * var(--gutter));
 }
 
 .section {
@@ -285,15 +291,9 @@ sub {
   background: var(--bg-tint);
 }
 
-/* BibTeX and Acknowledgments share one tinted band */
+/* Scope, BibTeX, and Acknowledgments share one tinted band. */
 .section--tint + .section--tint {
   padding-top: 0;
-}
-
-.section-lede {
-  margin: -8px 0 28px;
-  color: var(--muted);
-  text-align: center;
 }
 
 /* ---------- Top bar ----------
@@ -315,7 +315,7 @@ sub {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  max-width: calc(var(--wide) + 2 * var(--gutter));
+  max-width: calc(var(--measure) + 2 * var(--gutter));
   height: var(--topbar-h);
   margin-inline: auto;
   padding-inline: var(--gutter);
@@ -374,16 +374,30 @@ sub {
 }
 
 /* ---------- Header ----------
-   The name and a one-line claim lead; the paper's title (the h1) and
-   the acronym's expansion follow in smaller type. */
+   The paper title is the entry point; the subtitle states its practical
+   contribution. The blue comes from IMBUE's own result plots. */
 .hero {
-  padding-block: clamp(32px, 4.5vw, 56px) clamp(28px, 4vw, 44px);
+  --ink: var(--hero-ink);
+  --ink-strong: var(--hero-ink);
+  --muted: var(--hero-muted);
+  --accent: var(--hero-accent);
+  --accent-strong: var(--hero-accent-strong);
+  --accent-soft: var(--hero-soft);
+  --rule-soft: var(--hero-soft);
+  --btn-bg: var(--hero-ink);
+  --btn-ink: var(--hero-button-ink);
+  --btn-border: var(--hero-rule);
+  --on-accent: var(--hero-button-ink);
+  /* kept short so the overview figure below starts on the first screen */
+  padding-block: clamp(40px, 5vw, 64px);
+  background: var(--hero-bg);
+  color: var(--ink);
   text-align: center;
 }
 
 .venue {
   display: inline-block;
-  margin: 0 0 16px;
+  margin: 0 0 24px;
   padding: 5px 14px;
   border-radius: 999px;
   background: var(--accent-soft);
@@ -399,46 +413,43 @@ sub {
   margin: 0;
 }
 
-.hero__name {
-  margin: 0;
+/* At most 42px, so the full title fits the column in two lines on a
+   desktop screen. */
+.title {
+  margin: 0 auto;
   color: var(--ink-strong);
-  font-size: clamp(3.25rem, 2.3rem + 4.6vw, 5.5rem);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.035em;
+  font-size: clamp(1.85rem, 1.2rem + 2vw, 2.625rem);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+}
+
+.hero__name {
+  color: var(--accent);
+}
+
+.title__term {
+  white-space: nowrap;
 }
 
 .hero__claim {
-  max-width: 940px; /* one line on a desktop screen */
-  margin: 16px auto 0;
-  color: var(--ink-strong);
-  font-size: clamp(1.2rem, 1rem + 0.95vw, 1.65rem);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: -0.014em;
+  max-width: 46rem;
+  margin: 24px auto 0;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.3rem);
+  line-height: 1.6;
   text-wrap: balance;
 }
 
-.title {
-  max-width: 820px;
-  margin: 20px auto 0;
+/* each clause wraps as a unit, so a wide screen breaks between them */
+.hero__claim span {
+  display: inline-block;
+}
+
+.hero .btn[href^="#"] {
+  border-color: var(--hero-rule);
+  background: transparent;
   color: var(--ink);
-  font-size: clamp(1.02rem, 0.94rem + 0.42vw, 1.25rem);
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: -0.006em;
-}
-
-.acronym {
-  margin: 6px auto 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.acronym b {
-  color: var(--accent);
-  font-weight: 700;
 }
 
 .authors {
@@ -570,39 +581,17 @@ sub {
   height: auto;
 }
 
-/* A plot with numbered marks over it (Key findings). --x and --y place a
-   mark's centre as fractions of the image's width and height. */
-.figure__canvas {
-  position: relative;
-  display: block;
-}
-
-.mark {
-  position: absolute;
-  top: calc(var(--y) * 100%);
-  left: calc(var(--x) * 100%);
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  margin: -13px 0 0 -13px;
-  border: 2px solid var(--figure-bg);
-  border-radius: 999px;
-  background: var(--mark-bg);
-  box-shadow: 0 1px 4px rgba(15, 23, 32, 0.3);
-  color: var(--mark-ink);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-  pointer-events: none;
-}
-
-.figure figcaption {
-  max-width: var(--prose);
-  margin: 12px auto 0;
+/* Captions are as wide as their figure or table, never narrower. */
+.figure figcaption,
+.table-figure figcaption {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.6;
+  text-align: left;
+}
+
+.figure figcaption {
+  margin-block: 12px 0;
 }
 
 .figure figcaption p {
@@ -613,7 +602,8 @@ sub {
   margin-bottom: 0;
 }
 
-.figure figcaption b {
+.figure figcaption b,
+.table-figure figcaption b {
   color: var(--ink);
   font-weight: 600;
 }
@@ -622,8 +612,10 @@ sub {
   margin-block: clamp(28px, 4vw, 44px);
 }
 
-.figure--medium {
-  max-width: 760px;
+/* Near-square plots would fill a whole screen at the full column width,
+   so they sit centred at a narrower width, their captions with them. */
+.figure--narrow {
+  max-width: var(--narrow);
   margin-inline: auto;
 }
 
@@ -686,146 +678,170 @@ sub {
   background: #000;
 }
 
-/* ---------- Teaser ---------- */
+/* ---------- Overview ----------
+   The overview figure opens the page right under the header, so the
+   first screen already shows what IMBUE does; the problem statement,
+   the highlights and the abstract follow it. */
+.section--overview {
+  padding-top: clamp(28px, 4vw, 44px);
+}
+
 .teaser {
-  padding-bottom: clamp(44px, 6vw, 64px);
+  margin-bottom: clamp(48px, 7vw, 72px);
 }
 
-.teaser figcaption {
-  max-width: 900px;
-  margin-top: 22px;
-  text-align: center;
-}
-
-.teaser .teaser__lead {
-  margin-bottom: 10px;
+.intro-lead {
   color: var(--ink-strong);
-  font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.25rem);
-  font-weight: 500;
-  line-height: 1.55;
+  font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem);
+  line-height: 1.75;
 }
 
-/* ---------- Key findings ----------
-   Three numbered claims beside one plot whose marks carry the same
-   numbers; the section continues the overview's white band. */
-.findings {
-  padding-top: 0;
-}
-
-.findings__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: clamp(28px, 4vw, 56px);
-  align-items: start;
-}
-
-.findings__list {
-  display: grid;
-  gap: 26px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.findings__item h3 {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin: 0 0 6px;
-  font-size: 1.12rem;
-}
-
-.findings__num {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: var(--ink-strong);
-  color: var(--bg);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.findings__item p {
-  margin: 0 0 0 38px; /* under the heading's text, past the number */
-}
-
-.findings__item .findings__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 18px;
-  margin-top: 6px;
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-
-.findings__links a::after {
-  content: "\00a0\2192";
-  content: "\00a0\2192" / ""; /* an arrow that screen readers skip */
-}
-
-.findings__figure {
-  justify-self: center;
-  width: 100%;
-  max-width: 500px;
-}
-
-/* ---------- Method cards ---------- */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin: 0 0 clamp(32px, 5vw, 48px);
-}
-
-.card {
-  padding: 20px 22px 22px;
+/* ---------- Highlights: the paper's three contributions in brief ---------- */
+.highlights {
+  margin-top: clamp(28px, 4vw, 40px);
+  padding: 6px 24px;
   border: 1px solid var(--rule);
   border-radius: 14px;
   background: var(--surface);
 }
 
-.card h3 {
+.highlights h3 {
+  margin: 16px 0 4px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.highlights ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: highlight;
+}
+
+.highlights li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  padding-block: 14px 16px;
+  border-top: 1px solid var(--rule);
+  counter-increment: highlight;
+}
+
+.highlights li:first-child {
+  border-top: 0;
+}
+
+.highlights li::before {
+  content: counter(highlight, decimal-leading-zero);
+  color: var(--accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.highlights p {
+  margin: 0;
+}
+
+.highlights a {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* the arrow is decoration; the "/ ''" alternative keeps it silent for
+   screen readers where supported */
+.highlights a::after {
+  content: " \2192";
+  content: " \2192" / "";
+}
+
+/* ---------- Method: setup, token interface, filter, training ----------
+   Subsections in the order of Section 3 of the paper, as on the ALINE
+   page; each explains a step in prose, then states it as an equation. */
+.subsection {
+  margin: clamp(48px, 7vw, 64px) 0 12px;
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+}
+
+/* Prior and instance tokens keep the colours they have in the figures:
+   orange for prior information, purple for previous-instance data. */
+.swatch {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
-  font-size: 1.05rem;
 }
 
-.card h3::before {
+.swatch::before {
   content: "";
   flex: none;
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  background: var(--swatch, var(--accent));
+  background: var(--swatch);
 }
 
-.card--prior {
+.swatch--prior {
   --swatch: var(--swatch-prior);
 }
 
-.card--instance {
+.swatch--instance {
   --swatch: var(--swatch-instance);
 }
 
-.card p {
-  margin: 0;
-  font-size: 0.96rem;
-  line-height: 1.65;
+/* bulleted terms with a bold lead, as in the ALINE method section */
+.term-list {
+  margin: 0 0 1em;
+  padding-left: 1.25em;
 }
 
-/* ---------- Results: one block per finding ---------- */
+.term-list li + li {
+  margin-top: 0.45em;
+}
+
+.term-list li::marker {
+  color: var(--accent);
+}
+
+/* ---------- Results: one application and its evidence per block ---------- */
+.result-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 24px;
+}
+
+.result-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 7px 14px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.result-nav a:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+
+.finding__label {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .finding {
   margin-top: clamp(48px, 7vw, 80px);
-}
-
-.finding--first {
-  margin-top: 0;
 }
 
 .finding__text h3 {
@@ -836,39 +852,28 @@ sub {
   margin-bottom: 0;
 }
 
+/* Every finding reads the same way: label, claim and text, then the
+   evidence (figure or table) underneath. */
 .finding > .figure,
 .finding > .table-figure {
   margin-top: 24px;
 }
 
-/* Text beside its figure. The DOM keeps text first (the reading order on
-   phones); .finding--flip only swaps the two columns on wide screens. */
-.finding--split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: clamp(28px, 4vw, 56px);
-  align-items: center;
+/* One short attribution note replaces the appendix-style ablation section. */
+.research-note {
+  margin-top: clamp(48px, 7vw, 80px);
+  padding-block: 24px;
+  border-block: 1px solid var(--rule-strong);
 }
 
-.finding--flip .finding__text {
-  order: 2;
+.research-note p:last-child {
+  margin-bottom: 0;
 }
 
-.finding__figure--narrow {
-  justify-self: center;
-  width: 100%;
-  max-width: 480px;
-}
-
-.finding__figure > * + * {
-  margin-top: 20px;
-}
-
-.finding__note {
-  margin-top: 16px;
+.paper-link {
+  margin-top: 24px;
   margin-bottom: 0;
   color: var(--muted);
-  font-size: 0.95rem;
 }
 
 /* ---------- Glossary: how to read the results ---------- */
@@ -876,8 +881,7 @@ sub {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: 8px 20px;
-  max-width: var(--prose);
-  margin: 28px auto 0;
+  margin: 28px 0 0;
   padding: 18px 22px;
   border: 1px solid var(--rule);
   border-radius: 12px;
@@ -897,24 +901,11 @@ sub {
 
 /* ---------- Tables ---------- */
 .table-figure {
-  max-width: var(--wide);
-  margin: 28px auto 0;
-}
-
-.table-figure--narrow {
-  max-width: 860px;
+  margin: 28px 0 0;
 }
 
 .table-figure figcaption {
-  margin: 0 0 10px;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.table-figure figcaption b {
-  color: var(--ink);
-  font-weight: 600;
+  margin-block: 0 10px;
 }
 
 /* Wide tables scroll sideways inside their frame on phones instead of
@@ -1136,106 +1127,7 @@ sub {
   margin-bottom: 0;
 }
 
-/* ---------- Tabs (More results) ----------
-   Without JavaScript the tab strip stays hidden and every panel shows,
-   one after another, under its own heading. */
-.tablist {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto 32px;
-  padding: 6px;
-  border: 1px solid var(--rule);
-  border-radius: 16px;
-  background: var(--surface);
-}
-
-.tab {
-  min-height: 40px;
-  margin: 0;
-  padding: 9px 16px;
-  border: 0;
-  border-radius: 11px;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.94rem;
-  font-weight: 600;
-  line-height: 1.2;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.tab:hover {
-  background: var(--hover-bg);
-  color: var(--ink-strong);
-}
-
-.tab[aria-selected="true"] {
-  background: var(--btn-bg);
-  color: var(--btn-ink);
-}
-
-.tab-panel > * + * {
-  margin-top: 32px;
-}
-
-.tab-panel + .tab-panel {
-  margin-top: 64px;
-}
-
-.tab-panel__title {
-  margin-bottom: 0;
-  font-size: 1.3rem;
-  text-align: center;
-}
-
-.tabs.is-enhanced .tab-panel + .tab-panel {
-  margin-top: 0;
-}
-
-.tabs.is-enhanced .tab-panel__title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.tabs.is-enhanced .tab-panel__title + * {
-  margin-top: 0;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
-  align-items: start;
-}
-
-/* ---------- Limitations, acknowledgments ---------- */
-.limitations {
-  margin: 0;
-  padding-left: 1.2em;
-}
-
-.limitations li {
-  margin-bottom: 0.7em;
-  padding-left: 0.2em;
-}
-
-.limitations li::marker {
-  color: var(--accent);
-}
-
+/* ---------- Acknowledgments ---------- */
 .ack {
   margin: 0;
   font-size: 0.95rem;
@@ -1400,44 +1292,10 @@ sub {
   margin-bottom: 0;
 }
 
-/* the enlarged image has no numbered marks, so drop the caption's
-   pointers to them */
-.lightbox__caption .mark-ref {
-  display: none;
-}
-
-/* a slim bar of its own, so the close button never covers the figure */
-.lightbox__bar {
-  display: flex;
-  flex: none;
-  justify-content: flex-end;
-  padding: 6px;
-  border-bottom: 1px solid var(--rule);
-  background: var(--surface);
-}
-
-.lightbox__close {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: var(--btn-bg);
-  color: var(--btn-ink);
-  cursor: pointer;
-}
-
-.lightbox__close svg {
-  width: 20px;
-  height: 20px;
-}
-
 /* ---------- Theme toggle ----------
-   In the top bar. Cycles Helsinki daylight → light → dark, like the rest
-   of the site. Hidden without JavaScript, where the light theme is all
-   there is. */
+   In the top bar. Cycles automatic (the reader's system setting) → light
+   → dark. Hidden without JavaScript, where the light theme is all there
+   is. */
 .theme-toggle {
   display: none;
   justify-self: end;
@@ -1487,36 +1345,8 @@ sub {
   display: block;
 }
 
-/* ---------- Responsive ----------
-   Single columns are minmax(0, 1fr), not 1fr: a plain 1fr would let a
-   wide table inside a column push the column, and the page, past the
-   screen edge instead of scrolling inside its own frame. */
-@media (max-width: 920px) {
-  .cards {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 880px) {
-  .finding--split,
-  .findings__layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .finding--flip .finding__text {
-    order: 0;
-  }
-
-  .findings__figure {
-    max-width: 480px;
-  }
-}
-
+/* ---------- Responsive ---------- */
 @media (max-width: 760px) {
-  .grid-2 {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   /* Wide tables scroll here, so the first column (the method) stays put
      while the numbers slide under it. Its cells need opaque backgrounds,
      tinted ones included, and a rule along their right edge. */
@@ -1544,7 +1374,7 @@ sub {
   }
 }
 
-/* below this the bar has no room for the toggle's word ("Helsinki") */
+/* below this the bar has no room for the toggle's word ("Auto", "Light"...) */
 @media (max-width: 720px) {
   .theme-toggle {
     justify-content: center;
@@ -1636,19 +1466,6 @@ sub {
     margin-top: 12px;
   }
 
-  .title {
-    margin-top: 14px;
-  }
-
-  .acronym {
-    font-size: 0.8rem;
-  }
-
-  /* six centred lines are hard to read; align the teaser text left */
-  .teaser figcaption {
-    text-align: left;
-  }
-
   .authors {
     gap: 0 16px;
     margin-top: 18px;
@@ -1691,10 +1508,6 @@ sub {
     padding: 9px 11px;
   }
 
-  .tab {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1706,7 +1519,7 @@ sub {
   }
 }
 
-/* ---------- Print: light colours, no controls, every panel ---------- */
+/* ---------- Print: light colours, no controls ---------- */
 @media print {
   :root,
   :root[data-theme="dark"] {
@@ -1729,19 +1542,20 @@ sub {
   .skip-link,
   .topbar,
   .buttons,
-  .tablist,
+  .result-nav,
   .copy-btn,
   .lightbox,
   .zoom::after {
     display: none !important;
   }
 
-  .tab-panel[hidden] {
-    display: block !important;
-  }
-
-  .tabs.is-enhanced .tab-panel + .tab-panel {
-    margin-top: 32px;
+  .hero {
+    --hero-bg: none;
+    --hero-ink: #000;
+    --hero-muted: #333;
+    --hero-accent: #0173b2;
+    --hero-soft: transparent;
+    padding-block: 18pt;
   }
 
   .section {
@@ -1750,7 +1564,7 @@ sub {
 
   .figure__frame,
   .table-wrap,
-  .card,
+  .eq,
   .glossary {
     break-inside: avoid;
   }
